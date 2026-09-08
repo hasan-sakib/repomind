@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { FolderGitIcon, SettingsIcon, LayoutGridIcon } from "lucide-react";
+import { LayoutDashboardIcon, LayoutGridIcon, SettingsIcon, UsersIcon } from "lucide-react";
 
 import {
   Command,
@@ -14,11 +14,11 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { useShell } from "@/components/shell/shell-context";
-import { StatusDot } from "@/components/shell/status-dot";
-import { demoRepositories, demoWorkspaces } from "@/lib/demo-data";
+import { useCurrentOrg } from "@/lib/current-org";
 
-export function CommandPalette({ workspaceSlug }: { workspaceSlug: string }) {
+export function CommandPalette() {
   const { commandPaletteOpen, setCommandPaletteOpen } = useShell();
+  const { organizations, setCurrentOrgId } = useCurrentOrg();
   const router = useRouter();
 
   function go(href: string) {
@@ -29,44 +29,38 @@ export function CommandPalette({ workspaceSlug }: { workspaceSlug: string }) {
   return (
     <CommandDialog open={commandPaletteOpen} onOpenChange={setCommandPaletteOpen}>
       <Command>
-        <CommandInput placeholder="Search repositories, workspaces, settings…" />
+        <CommandInput placeholder="Search organizations, settings…" />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
-          <CommandGroup heading="Repositories">
-            {demoRepositories.map((repo) => (
-              <CommandItem
-                key={repo.id}
-                value={repo.name}
-                onSelect={() => go(`/${workspaceSlug}/${repo.slug}`)}
-              >
-                <StatusDot status={repo.status} />
-                {repo.name}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          <CommandSeparator />
-          <CommandGroup heading="Workspaces">
-            {demoWorkspaces.map((workspace) => (
-              <CommandItem
-                key={workspace.id}
-                value={workspace.name}
-                onSelect={() => go(`/${workspace.slug}`)}
-              >
-                <LayoutGridIcon />
-                {workspace.name}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          <CommandSeparator />
           <CommandGroup heading="Navigation">
-            <CommandItem value="Repositories" onSelect={() => go(`/${workspaceSlug}`)}>
-              <FolderGitIcon />
-              Go to repositories
+            <CommandItem value="Dashboard" onSelect={() => go("/dashboard")}>
+              <LayoutDashboardIcon />
+              Go to dashboard
             </CommandItem>
-            <CommandItem value="Settings" onSelect={() => go(`/${workspaceSlug}/settings`)}>
+            <CommandItem value="Settings" onSelect={() => go("/settings")}>
               <SettingsIcon />
               Go to settings
             </CommandItem>
+            <CommandItem value="Members" onSelect={() => go("/settings/members")}>
+              <UsersIcon />
+              Go to members
+            </CommandItem>
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Organizations">
+            {organizations.map((membership) => (
+              <CommandItem
+                key={membership.organization.id}
+                value={membership.organization.name}
+                onSelect={() => {
+                  setCurrentOrgId(membership.organization.id);
+                  setCommandPaletteOpen(false);
+                }}
+              >
+                <LayoutGridIcon />
+                {membership.organization.name}
+              </CommandItem>
+            ))}
           </CommandGroup>
         </CommandList>
       </Command>

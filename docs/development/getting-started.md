@@ -21,6 +21,11 @@ cp apps/web/.env.example apps/web/.env
 
 # Start local Postgres
 docker compose up -d postgres
+
+# Create the test database (separate from the dev database; the backend
+# test suite truncates all tables between tests, so it must not point at
+# your dev data)
+docker exec repomind-postgres-1 createdb -U repomind repomind_test
 ```
 
 ## Running the apps

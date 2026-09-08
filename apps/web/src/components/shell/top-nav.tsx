@@ -8,7 +8,7 @@ import { NotificationsMenu } from "@/components/shell/notifications-menu";
 import { useShell } from "@/components/shell/shell-context";
 import { UserMenu } from "@/components/shell/user-menu";
 
-export function TopNav({ workspaceSlug }: { workspaceSlug: string }) {
+export function TopNav() {
   const { setMobileNavOpen, setCommandPaletteOpen } = useShell();
 
   return (
@@ -23,7 +23,7 @@ export function TopNav({ workspaceSlug }: { workspaceSlug: string }) {
         <MenuIcon className="size-4" />
       </Button>
       <div className="min-w-0 flex-1">
-        <Breadcrumbs workspaceSlug={workspaceSlug} />
+        <Breadcrumbs />
       </div>
       <button
         type="button"

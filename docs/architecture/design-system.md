@@ -3,7 +3,7 @@
 This documents the actual token and component decisions implemented in
 `apps/web` for Phase 1 (application shell). It supersedes any tokens
 shadcn's `init` scaffolded by default — see `apps/web/src/app/globals.css`
-for the source of truth; this file explains the *why* behind it.
+for the source of truth; this file explains the _why_ behind it.
 
 ## Foundation
 
@@ -38,18 +38,15 @@ information-heavy UI (which repository is indexing right now, which nav
 item is active).
 
 Two semantic status colors were added beyond shadcn's defaults:
-`--success` (repository ready / indexing succeeded) and `--warning`
-(reserved for non-error caution states). `--destructive` (already provided
-by shadcn) covers failure states. Repository status maps to these directly
-(see `components/shell/status-dot.tsx` and the badge variants used in
-`(dashboard)/[workspaceSlug]/page.tsx`):
-
-| Status     | Color               | Used for                          |
-| ---------- | -------------------- | ---------------------------------- |
-| `pending`  | muted gray            | connected, not yet queued          |
-| `indexing` | brand blue (pulsing dot) | ingestion in progress          |
-| `ready`    | success green          | ingestion complete                |
-| `failed`   | destructive red        | ingestion failed                  |
+`--success` and `--warning`. `--destructive` (already provided by shadcn)
+covers failure states. Used today for account/member status (email
+verified/unverified, owner role) in `(dashboard)/settings/page.tsx` and
+`(dashboard)/settings/members/page.tsx`; the original repository-status
+mapping this section described (`pending`/`indexing`/`ready`/`failed`,
+via a `status-dot.tsx` component) was Phase 1 shell demo data and was
+removed when Phase 2 replaced the demo shell with real auth data — it
+will return once repository ingestion is actually built (Phase 3+), using
+the same tokens.
 
 ## Typography
 
@@ -88,24 +85,25 @@ cards) carries a shadow.
 ## Components used, and what was added
 
 Reused as-is from shadcn's default primitives: Button, Input, Badge (with
-added variants), Card, Dialog, DropdownMenu, Tabs, Table, Command (palette),
-Popover, Sheet, Tooltip, Skeleton, Avatar, Separator.
+added variants), Card, Dialog, AlertDialog, DropdownMenu, Select, Tabs,
+Table, Command (palette), Popover, Sheet, Tooltip, Skeleton, Avatar,
+Separator.
 
-Project-specific composites, all under `components/shell/`:
+Project-specific composites, all under `components/shell/` unless noted:
 
-- `status-dot.tsx` — the repository-status color mapping in one place, so
-  the switcher, command palette, and repository table all render status
-  identically.
 - `empty-state.tsx` / `error-state.tsx` (under `components/`, not
   `shell/` — used outside the dashboard too) — a consistent icon + title +
   description + optional action pattern, used instead of ad hoc "no data"
   text.
 - `app-shell.tsx`, `sidebar.tsx`, `top-nav.tsx`, `mobile-nav.tsx`,
-  `workspace-switcher.tsx`, `repo-switcher.tsx`, `breadcrumbs.tsx`,
+  `org-switcher.tsx` (+ `create-org-dialog.tsx`), `breadcrumbs.tsx`,
   `command-palette.tsx`, `user-menu.tsx`, `notifications-menu.tsx`,
-  `nav-items.tsx`, `shell-context.tsx` — see
-  `docs/architecture/frontend-architecture.md` for how these fit into the
-  route structure and data flow.
+  `nav-items.tsx`, `shell-context.tsx`, `dashboard-shell-client.tsx` — see
+  `docs/architecture/0002-auth-and-multi-tenancy.md` for the real routing
+  and data-flow decisions (this section originally described a
+  `[workspaceSlug]`-based shell with a repository switcher and demo data;
+  Phase 2 replaced both with flat routes, an organization switcher, and
+  real API data).
 
 ## Loading, empty, and error state convention
 
@@ -119,7 +117,7 @@ Project-specific composites, all under `components/shell/`:
   convention) renders `ErrorState` with a retry button wired to Next's
   `reset()`.
 
-## Known gaps carried into Phase 2
+## Known gaps carried forward
 
 - No dark-mode toggle is wired up yet (tokens are fully defined and
   verified for both `:root` and `.dark`, but nothing sets the `.dark` class
@@ -127,3 +125,6 @@ Project-specific composites, all under `components/shell/`:
 - No `kbd`/tooltip shadcn components beyond what's used inline; if a richer
   shortcuts UI is needed later, add the dedicated `kbd` primitive rather
   than continuing to inline `<kbd>` styling.
+- No frontend test runner configured — Phase 2's frontend was verified via
+  ad hoc Playwright scripts, not a committed test suite (see ADR 0002's
+  Testing section).

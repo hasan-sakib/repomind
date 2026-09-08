@@ -6,11 +6,17 @@ insight grounded in the actual code — not a generic AI chat wrapper.
 
 ## Status
 
-Early stage — foundational scaffolding is in place; the first product
-feature (repo ingestion + AI chat Q&A) is in active development. See
-[`docs/product/README.md`](docs/product/README.md) for scope and
+Authentication and multi-tenancy foundation is complete and tested: email/
+password auth, GitHub OAuth login, organizations with role-based
+authorization (owner/admin/developer/viewer), password reset, email
+verification, and a real dashboard shell — all backed by a real database
+and 39 passing backend tests. Repository connection and AI chat Q&A (the
+core product loop) are the next phase. See
+[`docs/product/README.md`](docs/product/README.md) for scope,
 [`docs/architecture/0001-foundation.md`](docs/architecture/0001-foundation.md)
-for the architectural decisions behind this foundation.
+for the initial architecture, and
+[`docs/architecture/0002-auth-and-multi-tenancy.md`](docs/architecture/0002-auth-and-multi-tenancy.md)
+for what this phase actually built.
 
 ## Stack
 

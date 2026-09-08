@@ -2,42 +2,22 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderGitIcon, SettingsIcon } from "lucide-react";
+import { LayoutDashboardIcon, SettingsIcon } from "lucide-react";
 
 import { cn } from "cn";
 
-export function getNavItems(workspaceSlug: string) {
-  return [
-    {
-      label: "Repositories",
-      href: `/${workspaceSlug}`,
-      icon: FolderGitIcon,
-      segment: null,
-    },
-    {
-      label: "Settings",
-      href: `/${workspaceSlug}/settings`,
-      icon: SettingsIcon,
-      segment: "settings",
-    },
-  ];
-}
+const NAV_ITEMS = [
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
+  { label: "Settings", href: "/settings", icon: SettingsIcon },
+];
 
-export function NavList({
-  workspaceSlug,
-  onNavigate,
-}: {
-  workspaceSlug: string;
-  onNavigate?: () => void;
-}) {
+export function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
-  const items = getNavItems(workspaceSlug);
 
   return (
     <nav aria-label="Primary" className="flex flex-col gap-0.5 px-2">
-      {items.map((item) => {
-        const isActive =
-          item.href === pathname || (item.segment !== null && pathname.startsWith(`${item.href}/`));
+      {NAV_ITEMS.map((item) => {
+        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
         return (
           <Link
