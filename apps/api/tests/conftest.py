@@ -45,11 +45,13 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 
+from app.api.deps import get_arq_pool
 from app.core.config import get_settings
 from app.db.base import Base
 from app.db.session import get_db_session
 from app.domain import models  # noqa: F401  (populates Base.metadata)
 from app.main import app
+from app.workers import tasks as worker_tasks
 
 settings = get_settings()
 
@@ -86,12 +88,36 @@ async def db_session(_engine: AsyncEngine) -> AsyncGenerator[AsyncSession]:
         await conn.exec_driver_sql(f"TRUNCATE TABLE {table_names} RESTART IDENTITY CASCADE")
 
 
+class FakeArqPool:
+    """Runs an enqueued job inline, synchronously, instead of pushing it
+    onto Redis for a real worker to pick up — mirrors how FastAPI
+    BackgroundTasks used to execute inline under ASGITransport before
+    sync/indexing moved onto the arq queue. Tests that need to assert
+    something was (or wasn't) queued can inspect `.enqueued`."""
+
+    def __init__(self) -> None:
+        self.enqueued: list[tuple[str, tuple[object, ...], dict[str, object]]] = []
+
+    async def enqueue_job(self, function: str, *args: object, **kwargs: object) -> None:
+        self.enqueued.append((function, args, kwargs))
+        task_fn = getattr(worker_tasks, function)
+        await task_fn({}, *args, **kwargs)
+
+
+@pytest.fixture
+def fake_arq_pool() -> FakeArqPool:
+    return FakeArqPool()
+
+
 @pytest_asyncio.fixture
-async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient]:
+async def client(
+    db_session: AsyncSession, fake_arq_pool: FakeArqPool
+) -> AsyncGenerator[AsyncClient]:
     async def override_get_db_session() -> AsyncGenerator[AsyncSession]:
         yield db_session
 
     app.dependency_overrides[get_db_session] = override_get_db_session
+    app.dependency_overrides[get_arq_pool] = lambda: fake_arq_pool
     transport = ASGITransport(app=app)
     async with AsyncClient(
         transport=transport, base_url="http://test", headers={"X-Requested-With": "RepoMind"}

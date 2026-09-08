@@ -9,6 +9,7 @@ import {
   GitCommitHorizontalIcon,
   GitPullRequestIcon,
   CircleDotIcon,
+  DatabaseZapIcon,
   RefreshCwIcon,
   StarIcon,
   GitForkIcon,
@@ -106,6 +107,14 @@ export default function RepositoryOverviewPage({
           >
             <RefreshCwIcon className={isSyncing ? "size-3.5 animate-spin" : "size-3.5"} />
             {isSyncing ? "Syncing…" : "Sync now"}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            render={<Link href={`/repositories/${repositoryId}/indexing`} />}
+            aria-label="Indexing"
+          >
+            <DatabaseZapIcon className="size-4" />
           </Button>
           <Button
             variant="ghost"

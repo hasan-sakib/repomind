@@ -91,3 +91,13 @@ class RepositoryAlreadyConnectedError(AppError):
 class WebhookVerificationError(AppError):
     status_code = 401
     code = "webhook_verification_failed"
+
+
+class RepositoryNotSyncedError(AppError):
+    status_code = 409
+    code = "repository_not_synced"
+
+
+class IndexingJobNotFoundError(AppError):
+    status_code = 404
+    code = "indexing_job_not_found"

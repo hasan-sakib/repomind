@@ -19,6 +19,15 @@ dependencies = [
     "python-multipart>=0.0.12",
     "argon2-cffi>=23.1.0",
     "pydantic[email]>=2.9.0",
+    "arq>=0.26.3",
+    "pathspec>=0.12.1",
+    "tree-sitter>=0.23.2",
+    "tree-sitter-python>=0.23.6",
+    "tree-sitter-javascript>=0.23.1",
+    "tree-sitter-typescript>=0.23.2",
+    "tree-sitter-go>=0.23.4",
+    "voyageai>=0.3.2",
+    "pgvector>=0.3.6",
 ]
 
 [dependency-groups]

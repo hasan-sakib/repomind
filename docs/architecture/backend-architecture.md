@@ -7,7 +7,13 @@
 > **two** separate GitHub integrations (an OAuth App for login, from
 > Phase 2, and a distinct GitHub App for installation/webhooks, from this
 > phase); see `docs/architecture/0003-github-integration.md` for the real
-> design and why it split that way.
+> design and why it split that way. The `app/services/ingestion_service.py`
+> / `app/workers/main.py` / `run_ingestion` names below are the Phase 1
+> plan — Phase 4 built this as `app/services/indexing_service.py` +
+> `app/indexing/` + `app/workers/tasks.py` (`index_repository`,
+> `sync_repository` — one indexing task, not a per-trigger-source split),
+> with GitHub sync also moved onto the same arq queue; see
+> `docs/architecture/0004-codebase-indexing.md`.
 
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** `apps/api` internal structure, auth model, GitHub App integration

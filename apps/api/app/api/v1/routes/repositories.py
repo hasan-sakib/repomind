@@ -1,15 +1,17 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 
 from app.api.deps import (
+    ArqPool,
     DbSession,
     get_current_user,
     require_csrf_header,
     require_organization_role,
     require_repository_access,
 )
+from app.domain.indexing_status import IndexingTrigger
 from app.domain.organization_member import OrganizationMember
 from app.domain.repository import Repository
 from app.domain.role import Role, role_at_least
@@ -17,6 +19,7 @@ from app.domain.user import User
 from app.repositories import (
     branch_repository,
     commit_repository,
+    indexing_job_repository,
     issue_repository,
     pull_request_repository,
 )
@@ -29,7 +32,8 @@ from app.schemas.github import (
     RepositoryOverview,
     RepositoryPublic,
 )
-from app.services import organization_service, repository_service, sync_service
+from app.schemas.indexing import IndexingJobPublic, TriggerIndexingResponse
+from app.services import indexing_service, organization_service, repository_service
 from app.services.exceptions import InsufficientRoleError
 
 org_router = APIRouter(
@@ -65,7 +69,7 @@ async def connect_repository(
     organization_id: uuid.UUID,
     body: ConnectRepositoryRequest,
     request: Request,
-    background_tasks: BackgroundTasks,
+    arq_pool: ArqPool,
     db: DbSession,
     user: Annotated[User, Depends(get_current_user)],
     _actor: Annotated[OrganizationMember, Depends(require_organization_role(Role.ADMIN))],
@@ -79,7 +83,7 @@ async def connect_repository(
         actor_user_id=user.id,
         audit_ip=_client_ip(request),
     )
-    background_tasks.add_task(sync_service.run_sync_in_background, repository.id)
+    await arq_pool.enqueue_job("sync_repository", str(repository.id))
     return RepositoryPublic.from_repository(repository)
 
 
@@ -106,12 +110,53 @@ async def get_repository_overview(
 @router.post("/{repository_id}/sync", status_code=202, dependencies=[Depends(require_csrf_header)])
 async def sync_repository_now(
     repository: Annotated[Repository, Depends(require_repository_access)],
-    background_tasks: BackgroundTasks,
+    arq_pool: ArqPool,
 ) -> dict[str, bool]:
     started = repository_service.can_start_sync(repository)
     if started:
-        background_tasks.add_task(sync_service.run_sync_in_background, repository.id)
+        await arq_pool.enqueue_job("sync_repository", str(repository.id))
     return {"started": started}
+
+
+@router.post(
+    "/{repository_id}/indexing-jobs",
+    status_code=202,
+    response_model=TriggerIndexingResponse,
+    dependencies=[Depends(require_csrf_header)],
+)
+async def trigger_indexing_now(
+    repository: Annotated[Repository, Depends(require_repository_access)],
+    db: DbSession,
+    arq_pool: ArqPool,
+) -> TriggerIndexingResponse:
+    job, started = await indexing_service.trigger_indexing(
+        db, repository=repository, trigger=IndexingTrigger.MANUAL
+    )
+    if started:
+        await arq_pool.enqueue_job("index_repository", str(job.id))
+    return TriggerIndexingResponse(started=started, job=IndexingJobPublic.from_job(job))
+
+
+@router.get("/{repository_id}/indexing-jobs", response_model=list[IndexingJobPublic])
+async def list_indexing_jobs(
+    repository: Annotated[Repository, Depends(require_repository_access)],
+    db: DbSession,
+) -> list[IndexingJobPublic]:
+    jobs = await indexing_job_repository.list_for_repository(db, repository.id)
+    return [IndexingJobPublic.from_job(j) for j in jobs]
+
+
+@router.get(
+    "/{repository_id}/indexing-jobs/{job_id}",
+    response_model=IndexingJobPublic,
+)
+async def get_indexing_job(
+    repository: Annotated[Repository, Depends(require_repository_access)],
+    job_id: uuid.UUID,
+    db: DbSession,
+) -> IndexingJobPublic:
+    job = await indexing_service.get_job_or_raise(db, repository_id=repository.id, job_id=job_id)
+    return IndexingJobPublic.from_job(job)
 
 
 @router.delete("/{repository_id}", status_code=204, dependencies=[Depends(require_csrf_header)])

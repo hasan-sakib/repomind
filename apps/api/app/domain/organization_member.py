@@ -1,12 +1,12 @@
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum, ForeignKey, UniqueConstraint
+from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin
+from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
 from app.domain.role import Role
 
 if TYPE_CHECKING:
@@ -26,15 +26,7 @@ class OrganizationMember(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
     user_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
-    role: Mapped[Role] = mapped_column(
-        Enum(
-            Role,
-            name="organization_role",
-            native_enum=True,
-            values_callable=lambda enum_cls: [member.value for member in enum_cls],
-        ),
-        nullable=False,
-    )
+    role: Mapped[Role] = mapped_column(enum_column(Role, "organization_role"), nullable=False)
 
     organization: Mapped["Organization"] = relationship(back_populates="members")
     user: Mapped["User"] = relationship(back_populates="memberships")

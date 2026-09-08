@@ -10,6 +10,15 @@ and worker processes actually do), `docs/architecture/frontend-architecture.md`
 (the frontend's cookie/CORS dependency on the domain topology this doc sets
 up — see §3). This document supersedes the previous stub at this path.
 
+> **Note:** the worker entrypoint below is written as
+> `app.workers.main.WorkerSettings` / `IngestionJob` (the Phase 1 plan).
+> Phase 4 actually built it as `app.workers.settings.WorkerSettings`
+> (tasks `index_repository`, `sync_repository` in `app/workers/tasks.py`)
+> and `IndexingJob`, not `IngestionJob` — see
+> `docs/architecture/0004-codebase-indexing.md`. Nothing in this document
+> is provisioned yet, so this is a correction to apply when it is, not a
+> description of something already deployed differently.
+
 ## 1. Topology
 
 ```mermaid

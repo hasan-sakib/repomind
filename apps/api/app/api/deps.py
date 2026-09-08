@@ -3,7 +3,8 @@ from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import Cookie, Depends, Header, Path
+from arq.connections import ArqRedis
+from fastapi import Cookie, Depends, Header, Path, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security.tokens import InvalidTokenError, decode_access_token
@@ -22,6 +23,16 @@ REFRESH_COOKIE_NAME = "rm_refresh"
 CSRF_HEADER_VALUE = "RepoMind"
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+
+def get_arq_pool(request: Request) -> ArqRedis:
+    """The arq Redis pool created once in the FastAPI lifespan (app/main.py)
+    — not a per-request connection."""
+    pool: ArqRedis = request.app.state.arq_pool
+    return pool
+
+
+ArqPool = Annotated[ArqRedis, Depends(get_arq_pool)]
 
 
 async def get_current_user_and_session(

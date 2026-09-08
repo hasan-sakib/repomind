@@ -58,6 +58,27 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-opus-5"
 
+    # Embedding provider — see app/ai/embedding_provider.py. Anthropic has no
+    # first-party embeddings API; Voyage is Anthropic's recommended partner
+    # and voyage-code-3 is tuned for source code. See
+    # docs/architecture/0004-codebase-indexing.md.
+    embedding_provider: Literal["voyage"] = "voyage"
+    voyage_api_key: str = ""
+    voyage_model: str = "voyage-code-3"
+    # voyage-code-3 supports Matryoshka output truncation (256/512/1024/2048).
+    # 1024 balances retrieval quality against pgvector index size/build time.
+    embedding_dimension: int = 1024
+
+    # Background job queue (indexing, re-indexing, embeddings). See
+    # docs/architecture/0004-codebase-indexing.md for why arq/Redis replaced
+    # Phase 3's FastAPI BackgroundTasks.
+    redis_url: str = "redis://localhost:6379"
+
+    # Indexing pipeline tunables.
+    indexing_max_file_size_bytes: int = 500_000
+    indexing_max_files_per_repository: int = 3000
+    indexing_max_chunk_lines: int = 200
+
 
 @lru_cache
 def get_settings() -> Settings:

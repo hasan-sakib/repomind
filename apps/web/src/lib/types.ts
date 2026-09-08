@@ -135,3 +135,84 @@ export interface RepositoryOverview {
   open_pull_requests: PullRequest[];
   open_issues: Issue[];
 }
+
+export type IndexingJobStatus = "queued" | "running" | "succeeded" | "failed" | "partial";
+
+export const INDEXING_JOB_STATUS_LABELS: Record<IndexingJobStatus, string> = {
+  queued: "Queued",
+  running: "Indexing",
+  succeeded: "Indexed",
+  failed: "Failed",
+  partial: "Indexed with errors",
+};
+
+export type IndexingTrigger = "initial" | "manual" | "webhook";
+
+export const INDEXING_TRIGGER_LABELS: Record<IndexingTrigger, string> = {
+  initial: "Initial index",
+  manual: "Manual",
+  webhook: "Push",
+};
+
+export type IndexingStage =
+  | "fetching"
+  | "discovering"
+  | "filtering"
+  | "parsing"
+  | "chunking"
+  | "embedding"
+  | "done";
+
+export const INDEXING_STAGE_LABELS: Record<IndexingStage, string> = {
+  fetching: "Fetching repository",
+  discovering: "Discovering files",
+  filtering: "Filtering files",
+  parsing: "Parsing code",
+  chunking: "Chunking",
+  embedding: "Generating embeddings",
+  done: "Done",
+};
+
+// Ordered by pipeline position — used to render a stage progress track.
+export const INDEXING_STAGE_ORDER: IndexingStage[] = [
+  "fetching",
+  "discovering",
+  "filtering",
+  "parsing",
+  "chunking",
+  "embedding",
+  "done",
+];
+
+export interface IndexingErrorEntry {
+  id: string;
+  file_path: string | null;
+  stage: IndexingStage;
+  message: string;
+  created_at: string;
+}
+
+export interface IndexingJob {
+  id: string;
+  repository_id: string;
+  status: IndexingJobStatus;
+  trigger: IndexingTrigger;
+  commit_sha: string;
+  current_stage: IndexingStage | null;
+  files_discovered: number;
+  files_processed: number;
+  files_skipped: number;
+  symbols_extracted: number;
+  chunks_created: number;
+  embeddings_generated: number;
+  started_at: string | null;
+  finished_at: string | null;
+  error: string | null;
+  created_at: string;
+  errors: IndexingErrorEntry[];
+}
+
+export interface TriggerIndexingResponse {
+  started: boolean;
+  job: IndexingJob;
+}

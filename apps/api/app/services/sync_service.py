@@ -20,10 +20,10 @@ logger = logging.getLogger("repomind.sync")
 
 
 async def run_sync_in_background(repository_id: uuid.UUID) -> None:
-    """Entry point for FastAPI `BackgroundTasks` (and webhook-triggered
-    resyncs). Opens its own database session rather than reusing the
-    request's — the request's session is closed once the response is sent,
-    before a background task actually runs."""
+    """Entry point for the `sync_repository` arq task (app/workers/tasks.py).
+    Opens its own database session rather than reusing the request's — a
+    worker task runs in a separate process after the enqueueing request's
+    session has already been closed."""
     async with async_session_factory() as db:
         repository = await db.get(
             Repository, repository_id, options=[selectinload(Repository.installation)]
@@ -41,9 +41,10 @@ async def sync_repository(db: AsyncSession, repository: Repository) -> None:
     webhook or a manual "sync now" click never duplicates rows.
 
     Every step is bounded (see app/integrations/github/rest_client.py) —
-    this fetches a recent window, not full history. Runs via FastAPI
-    BackgroundTasks today, not a dedicated worker queue — see
-    docs/architecture/0003-github-integration.md for that tradeoff."""
+    this fetches a recent window, not full history. Runs on the arq worker
+    queue (see docs/architecture/0004-codebase-indexing.md for why that
+    replaced the FastAPI BackgroundTasks approach from
+    docs/architecture/0003-github-integration.md)."""
     repository_repository.mark_syncing(repository)
     await db.commit()
 

@@ -1,11 +1,13 @@
 import json
 from typing import Annotated
 
-from fastapi import APIRouter, BackgroundTasks, Header, Request
+from fastapi import APIRouter, Header, Request
 
-from app.api.deps import DbSession
+from app.api.deps import ArqPool, DbSession
+from app.domain.indexing_status import IndexingTrigger
 from app.integrations.github.webhooks import SUPPORTED_EVENTS, verify_signature
-from app.services import sync_service, webhook_service
+from app.repositories import repository_repository
+from app.services import indexing_service, webhook_service
 from app.services.exceptions import WebhookVerificationError
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
@@ -15,7 +17,7 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 async def github_webhook(
     request: Request,
     db: DbSession,
-    background_tasks: BackgroundTasks,
+    arq_pool: ArqPool,
     x_hub_signature_256: Annotated[str | None, Header()] = None,
     x_github_event: Annotated[str | None, Header()] = None,
     x_github_delivery: Annotated[str | None, Header()] = None,
@@ -42,4 +44,15 @@ async def github_webhook(
         payload=payload,
     )
     if result.resync_repository_id is not None:
-        background_tasks.add_task(sync_service.run_sync_in_background, result.resync_repository_id)
+        await arq_pool.enqueue_job("sync_repository", str(result.resync_repository_id))
+    if result.reindex is not None:
+        repository_id, commit_sha = result.reindex
+        repository = await repository_repository.get_by_id(db, repository_id)
+        if repository is not None:
+            # commit_sha always set here (the pushed commit), so this never
+            # hits the "no synced default branch" guard in trigger_indexing.
+            job, started = await indexing_service.trigger_indexing(
+                db, repository=repository, trigger=IndexingTrigger.WEBHOOK, commit_sha=commit_sha
+            )
+            if started:
+                await arq_pool.enqueue_job("index_repository", str(job.id))

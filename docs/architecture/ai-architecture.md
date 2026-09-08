@@ -1,11 +1,23 @@
 # AI Architecture
 
-**Status:** Accepted
+**Status:** Accepted — **superseded in part**, see note below
 **Date:** 2026-09-08
 **Depends on:** `docs/architecture/0001-foundation.md` (provider abstraction pattern, layered backend)
 **Cross-references:** `docs/database/database-design.md` (schema this pipeline reads/writes),
 `backend-architecture.md` (GitHub installation-token flow, installation-token Redis cache),
 `api-design.md` (SSE relay of the token stream to the frontend)
+
+> **This document was written in Phase 1, as a plan, before any of it was
+> built.** Everything about **ingestion** (chunking, tree-sitter, the
+> `IngestionJob`/`code_chunks`-with-inline-embedding schema, `app/workers/`)
+> was superseded by what was actually implemented in Phase 4 — see
+> `docs/architecture/0004-codebase-indexing.md`, which is the source of
+> truth for the real pipeline, table names, and worker task shape. The
+> `AIProvider`/`EmbeddingProvider` abstraction pattern and the Voyage/
+> `voyage-code-3` reasoning in section 1 below held up and were implemented
+> as planned. **Retrieval/search** (section on pgvector cosine-search chat
+> context) is still unbuilt — that section remains a plan, not a
+> description of a built system.
 
 This document covers the two things Phase 1 actually builds AI logic around:
 ingesting a connected repository into searchable, embedded chunks, and

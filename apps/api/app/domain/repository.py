@@ -6,7 +6,6 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     DateTime,
-    Enum,
     ForeignKey,
     Integer,
     String,
@@ -18,13 +17,15 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin
+from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
 from app.domain.repository_status import RepositoryStatus
 
 if TYPE_CHECKING:
     from app.domain.branch import Branch
+    from app.domain.code_file import CodeFile
     from app.domain.commit import Commit
     from app.domain.github_installation import GitHubInstallation
+    from app.domain.indexing_job import IndexingJob
     from app.domain.issue import Issue
     from app.domain.pull_request import PullRequest
     from app.domain.repository_membership import RepositoryMembership
@@ -58,12 +59,7 @@ class Repository(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
     html_url: Mapped[str] = mapped_column(String(500), nullable=False)
 
     status: Mapped[RepositoryStatus] = mapped_column(
-        Enum(
-            RepositoryStatus,
-            name="repository_status",
-            native_enum=True,
-            values_callable=lambda enum_cls: [member.value for member in enum_cls],
-        ),
+        enum_column(RepositoryStatus, "repository_status"),
         nullable=False,
         default=RepositoryStatus.PENDING,
     )
@@ -89,3 +85,7 @@ class Repository(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
     issues: Mapped[list["Issue"]] = relationship(
         back_populates="repository", cascade="all, delete-orphan"
     )
+    code_files: Mapped[list["CodeFile"]] = relationship(
+        back_populates="repository", cascade="all, delete-orphan"
+    )
+    indexing_jobs: Mapped[list["IndexingJob"]] = relationship(cascade="all, delete-orphan")

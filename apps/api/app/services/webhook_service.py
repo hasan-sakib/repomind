@@ -20,11 +20,19 @@ logger = logging.getLogger("repomind.webhooks")
 
 
 class WebhookResult:
-    __slots__ = ("resync_repository_id", "duplicate")
+    __slots__ = ("resync_repository_id", "duplicate", "reindex")
 
-    def __init__(self, resync_repository_id: uuid.UUID | None = None, duplicate: bool = False):
+    def __init__(
+        self,
+        resync_repository_id: uuid.UUID | None = None,
+        duplicate: bool = False,
+        reindex: tuple[uuid.UUID, str] | None = None,
+    ):
         self.resync_repository_id = resync_repository_id
         self.duplicate = duplicate
+        # (repository_id, commit_sha) for the pushed commit — set only for
+        # a push to the default branch, same condition that drives resync.
+        self.reindex = reindex
 
 
 async def _find_repository(
@@ -112,7 +120,12 @@ async def _handle_push(db: AsyncSession, payload: dict[str, Any]) -> WebhookResu
         # Only the default branch drives an automatic resync — pushes to
         # feature branches would otherwise trigger a sync storm.
         return WebhookResult()
-    return WebhookResult(resync_repository_id=repository.id)
+    if payload.get("deleted") or not payload.get("after"):
+        # A branch deletion push has no real commit to sync/reindex.
+        return WebhookResult()
+    return WebhookResult(
+        resync_repository_id=repository.id, reindex=(repository.id, payload["after"])
+    )
 
 
 async def _handle_pull_request(db: AsyncSession, payload: dict[str, Any]) -> WebhookResult:

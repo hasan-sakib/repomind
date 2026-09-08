@@ -10,7 +10,13 @@
 > `docs/architecture/0003-github-integration.md` for the real, shipped
 > API surface. Auth routes (`/auth/*`, `/organizations/*` member
 > management, `/users/*`) below match Phase 2's real implementation — see
-> `docs/architecture/0002-auth-and-multi-tenancy.md`.
+> `docs/architecture/0002-auth-and-multi-tenancy.md`. Phase 4 shipped the
+> real indexing-trigger/status API — `POST` and `GET
+> /repositories/{id}/indexing-jobs`, `GET
+> /repositories/{id}/indexing-jobs/{jobId}` — see
+> `docs/architecture/0004-codebase-indexing.md`; the ingestion-job
+> endpoints sketched below (and the chat/retrieval endpoints, which read
+> `CodeChunk` rows for citations) remain unbuilt design.
 
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** Full REST surface under `/api/v1`, error shape, pagination, rate
