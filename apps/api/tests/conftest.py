@@ -1,10 +1,37 @@
 import os
 from collections.abc import AsyncGenerator
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 os.environ.setdefault("ENVIRONMENT", "test")
 os.environ.setdefault("JWT_SECRET", "test-secret-at-least-32-bytes-long-for-hs256")
 os.environ.setdefault(
     "DATABASE_URL", "postgresql+asyncpg://repomind:repomind@localhost:5432/repomind_test"
+)
+os.environ.setdefault("GITHUB_WEBHOOK_SECRET", "test-webhook-secret")
+os.environ.setdefault("GITHUB_APP_ID", "123456")
+os.environ.setdefault("GITHUB_APP_SLUG", "repomind-test-app")
+
+# A throwaway RSA keypair, generated fresh per test run — the GitHub App
+# JWT signing path needs *a* valid private key, never a real one in tests.
+_TEST_RSA_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+os.environ.setdefault(
+    "GITHUB_APP_PRIVATE_KEY",
+    _TEST_RSA_KEY.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption(),
+    ).decode("utf-8"),
+)
+
+TEST_RSA_PUBLIC_KEY_PEM = (
+    _TEST_RSA_KEY.public_key()
+    .public_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
+    )
+    .decode("utf-8")
 )
 
 import pytest

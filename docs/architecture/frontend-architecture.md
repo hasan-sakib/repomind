@@ -1,5 +1,17 @@
 # Frontend Architecture
 
+> **Note:** the routing model below (`[workspaceSlug]/[repoSlug]/...`) was
+> superseded before implementation. Phase 2 shipped flat routes
+> (`/dashboard`, `/settings`, `/settings/members`) with the active
+> organization tracked client-side instead of in the URL — see
+> `docs/architecture/0002-auth-and-multi-tenancy.md`. Phase 3 continued
+> that pattern for repositories: `/repositories/[repositoryId]` (not
+> `[workspaceSlug]/[repoSlug]`), with `/dashboard` itself becoming the
+> connected-repositories list — see
+> `docs/architecture/0003-github-integration.md`. The data-fetching
+> split, state-management reasoning, and UX conventions (loading/empty/
+> error states) below still describe what was actually built.
+
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** `apps/web` routing, auth-aware layout, data-fetching split between
 server and client components, state management, component organization,

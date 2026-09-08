@@ -1,5 +1,17 @@
 # API Design
 
+> **Note:** this document describes the Phase 1 target API for the
+> eventual AI ingestion/chat product (repositories tied directly to
+> embeddings and chat sessions). The GitHub-integration routes actually
+> implemented in Phase 3 (`/organizations/{id}/github/*`,
+> `/organizations/{id}/repositories`, `/repositories/{id}/*`,
+> `/webhooks/github`) are metadata-sync-oriented, not AI-oriented, and
+> differ from what's sketched below — see
+> `docs/architecture/0003-github-integration.md` for the real, shipped
+> API surface. Auth routes (`/auth/*`, `/organizations/*` member
+> management, `/users/*`) below match Phase 2's real implementation — see
+> `docs/architecture/0002-auth-and-multi-tenancy.md`.
+
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** Full REST surface under `/api/v1`, error shape, pagination, rate
 limiting

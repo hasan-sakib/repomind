@@ -58,9 +58,7 @@ async def create_organization(
 
 @router.get("/{organization_id}", response_model=OrganizationPublic)
 async def get_organization(
-    member: Annotated[
-        OrganizationMember, Depends(require_organization_role(Role.VIEWER))
-    ],
+    member: Annotated[OrganizationMember, Depends(require_organization_role(Role.VIEWER))],
     db: DbSession,
 ) -> OrganizationPublic:
     organization = await organization_repository.get_by_id(db, member.organization_id)
@@ -72,9 +70,7 @@ async def get_organization(
 async def list_members(
     organization_id: uuid.UUID,
     db: DbSession,
-    _member: Annotated[
-        OrganizationMember, Depends(require_organization_role(Role.VIEWER))
-    ],
+    _member: Annotated[OrganizationMember, Depends(require_organization_role(Role.VIEWER))],
 ) -> list[MemberPublic]:
     members = await organization_service.list_members(db, organization_id)
     return [MemberPublic.from_member(m) for m in members]
@@ -91,9 +87,7 @@ async def add_member(
     body: AddMemberRequest,
     request: Request,
     db: DbSession,
-    actor: Annotated[
-        OrganizationMember, Depends(require_organization_role(Role.ADMIN))
-    ],
+    actor: Annotated[OrganizationMember, Depends(require_organization_role(Role.ADMIN))],
 ) -> MemberPublic:
     member = await organization_service.add_member(
         db,
@@ -118,9 +112,7 @@ async def update_member_role(
     body: UpdateMemberRoleRequest,
     request: Request,
     db: DbSession,
-    actor: Annotated[
-        OrganizationMember, Depends(require_organization_role(Role.ADMIN))
-    ],
+    actor: Annotated[OrganizationMember, Depends(require_organization_role(Role.ADMIN))],
 ) -> MemberPublic:
     member = await organization_service.update_member_role(
         db,
@@ -144,9 +136,7 @@ async def remove_member(
     user_id: uuid.UUID,
     request: Request,
     db: DbSession,
-    actor: Annotated[
-        OrganizationMember, Depends(require_organization_role(Role.VIEWER))
-    ],
+    actor: Annotated[OrganizationMember, Depends(require_organization_role(Role.VIEWER))],
 ) -> None:
     # Minimum role is VIEWER (i.e. just "is a member") at the route level
     # because self-removal must always be allowed regardless of role;

@@ -42,7 +42,7 @@ module itself.
 
 A `Session` row is created once per login (email/password, GitHub OAuth,
 or registration) and represents "one logged-in device/browser instance."
-A `RefreshToken` row is a rotated, single-use credential *for* a session.
+A `RefreshToken` row is a rotated, single-use credential _for_ a session.
 This split is what makes real session management possible — revoking a
 `Session` (logout) immediately invalidates every access token and refresh
 token derived from it, without needing to hunt down and revoke each
@@ -115,10 +115,10 @@ email.
 
 Phase 1's database-design.md sketched `owner|admin|member`. This phase
 implements the four roles actually requested: `OWNER > ADMIN > DEVELOPER
-> VIEWER` (`app/domain/role.py`, `role_at_least` for ordering checks).
-`docs/database/database-design.md`'s `organization_role` enum values are
-now stale — treat this ADR as authoritative for the role set until that
-doc is revised.
+
+> VIEWER` (`app/domain/role.py`, `role_at_least`for ordering checks).`docs/database/database-design.md`'s `organization_role` enum values are
+> now stale — treat this ADR as authoritative for the role set until that
+> doc is revised.
 
 Authorization rules (`app/services/organization_service.py`), each with a
 passing integration test:
@@ -126,7 +126,7 @@ passing integration test:
 - Any member (`VIEWER`+) can view the organization and its member list.
 - `ADMIN`+ can add/remove members and change roles — **except** an `ADMIN`
   cannot grant or modify the `OWNER` role; only an existing `OWNER` can.
-- A member can always remove *themselves* regardless of role (leaving an
+- A member can always remove _themselves_ regardless of role (leaving an
   organization needs no special permission) — except the organization's
   last remaining `OWNER` can neither leave nor be demoted/removed
   (`LastOwnerError`), which would otherwise orphan the organization.
@@ -147,7 +147,7 @@ one organization's dashboard) — not something this phase needed.
 `middleware.ts` was renamed to `proxy.ts` — Next.js 16 deprecated the
 `middleware` file convention (same mechanics, `export function proxy`
 instead of `export function middleware`). It performs a UX-only redirect
-based on cookie *presence*; the API independently and authoritatively
+based on cookie _presence_; the API independently and authoritatively
 enforces real auth on every request regardless of what the proxy decides.
 
 ### Server/client data flow

@@ -1,11 +1,26 @@
 # Database Design
 
-**Status:** Accepted
+**Status:** Accepted (as the Phase 1 target schema for AI ingestion — not yet built)
 **Date:** 2026-09-08
 **Depends on:** `docs/architecture/0001-foundation.md` (async SQLAlchemy + Alembic setup)
 **Cross-references:** `docs/architecture/ai-architecture.md` (ingestion/retrieval pipelines
 that read and write `code_chunks` and `ingestion_jobs`), `backend-architecture.md`
 (GitHub installation-token flow that populates `github_installations`)
+
+> **Note:** the `repositories`/`github_installations` tables and the
+> `organization_role` enum values described below are the Phase 1 target
+> shape for the eventual AI-ingestion product, and predate the real
+> schema. Phases 2 and 3 shipped a different, real schema —
+> `users`, `organizations`, `organization_members` (roles are
+> `owner`/`admin`/`developer`/`viewer`, not `owner`/`admin`/`member`),
+> `sessions`, `refresh_tokens`, `audit_logs` (ADR 0002), and
+> `github_installations`, `repositories`, `branches`, `commits`,
+> `pull_requests`, `issues`, `repository_memberships`, `webhook_events`
+> (ADR 0003, with a materially different `repositories`/
+> `github_installations` shape than what's sketched here — no
+> `code_chunks`/embeddings yet). Treat this document as the plan for
+> Phase 4+ AI ingestion, and the two ADRs as the current, actually-applied
+> migrations.
 
 PostgreSQL, accessed via async SQLAlchemy (`asyncpg` driver, per ADR 0001).
 The `pgvector` extension is required for `code_chunks.embedding` and is

@@ -9,6 +9,17 @@ const SEGMENT_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   settings: "Settings",
   members: "Members",
+  repositories: "Repositories",
+  connect: "Connect",
+};
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// The "repositories" URL segment has no page of its own — the list lives
+// at /dashboard — so its breadcrumb must point there instead of forming
+// the literal (non-existent) /repositories URL.
+const SEGMENT_HREF_OVERRIDES: Record<string, string> = {
+  repositories: "/dashboard",
 };
 
 export function Breadcrumbs() {
@@ -16,8 +27,9 @@ export function Breadcrumbs() {
   const segments = pathname.split("/").filter(Boolean);
 
   const crumbs = segments.map((segment, index) => {
-    const href = `/${segments.slice(0, index + 1).join("/")}`;
-    return { href, label: SEGMENT_LABELS[segment] ?? segment };
+    const href = SEGMENT_HREF_OVERRIDES[segment] ?? `/${segments.slice(0, index + 1).join("/")}`;
+    const label = UUID_PATTERN.test(segment) ? "Overview" : (SEGMENT_LABELS[segment] ?? segment);
+    return { href, label };
   });
 
   return (

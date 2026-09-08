@@ -121,8 +121,10 @@ async def login(
     user_agent: str | None,
 ) -> AuthResult:
     user = await user_repository.get_by_email(db, email)
-    if user is None or user.password_hash is None or not verify_password(
-        password, user.password_hash
+    if (
+        user is None
+        or user.password_hash is None
+        or not verify_password(password, user.password_hash)
     ):
         raise InvalidCredentialsError("Invalid email or password")
 
@@ -168,12 +170,18 @@ async def login_with_github(
         # GitHub already verified this email address.
         user.email_verified_at = datetime.now(UTC)
         audit_log_repository.create(
-            db, action="user.registered", actor_user_id=user.id, ip_address=ip_address,
+            db,
+            action="user.registered",
+            actor_user_id=user.id,
+            ip_address=ip_address,
             extra={"provider": "github"},
         )
 
     audit_log_repository.create(
-        db, action="user.login", actor_user_id=user.id, ip_address=ip_address,
+        db,
+        action="user.login",
+        actor_user_id=user.id,
+        ip_address=ip_address,
         extra={"provider": "github"},
     )
     session_row, access_token, raw_refresh_token = await _issue_session(
@@ -184,9 +192,7 @@ async def login_with_github(
     return AuthResult(user, session_row, access_token, raw_refresh_token)
 
 
-async def refresh_session(
-    db: AsyncSession, *, raw_refresh_token: str
-) -> tuple[str, str]:
+async def refresh_session(db: AsyncSession, *, raw_refresh_token: str) -> tuple[str, str]:
     """Returns (new_access_token, new_raw_refresh_token). Rotates the
     refresh token on every use; presenting an already-rotated token revokes
     the whole session (theft indicator) — see docs/architecture/backend-architecture.md."""
@@ -249,9 +255,7 @@ async def request_password_reset(db: AsyncSession, *, email: str) -> None:
         f"{settings.password_reset_token_ttl_minutes} minutes. "
         "If you didn't request this, you can ignore this email.",
     )
-    audit_log_repository.create(
-        db, action="user.password_reset_requested", actor_user_id=user.id
-    )
+    audit_log_repository.create(db, action="user.password_reset_requested", actor_user_id=user.id)
     await db.commit()
 
 
@@ -273,9 +277,7 @@ async def confirm_password_reset(db: AsyncSession, *, token: str, new_password: 
     for session_row in await session_repository.list_active_for_user(db, user.id):
         session_repository.revoke(session_row, at=now)
 
-    audit_log_repository.create(
-        db, action="user.password_reset_completed", actor_user_id=user.id
-    )
+    audit_log_repository.create(db, action="user.password_reset_completed", actor_user_id=user.id)
     await db.commit()
 
 

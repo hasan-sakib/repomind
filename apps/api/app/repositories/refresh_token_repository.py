@@ -8,9 +8,7 @@ from app.domain.refresh_token import RefreshToken
 
 
 async def get_by_token_hash(db: AsyncSession, token_hash: str) -> RefreshToken | None:
-    result = await db.execute(
-        select(RefreshToken).where(RefreshToken.token_hash == token_hash)
-    )
+    result = await db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_hash))
     return result.scalar_one_or_none()
 
 

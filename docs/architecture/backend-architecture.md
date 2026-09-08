@@ -1,5 +1,14 @@
 # Backend Architecture
 
+> **Note:** the auth model and layering below matches what Phase 2
+> actually shipped (see `docs/architecture/0002-auth-and-multi-tenancy.md`).
+> The "GitHub App integration" section below was written as a single
+> combined App (login + installation + webhooks) — Phase 3 instead built
+> **two** separate GitHub integrations (an OAuth App for login, from
+> Phase 2, and a distinct GitHub App for installation/webhooks, from this
+> phase); see `docs/architecture/0003-github-integration.md` for the real
+> design and why it split that way.
+
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** `apps/api` internal structure, auth model, GitHub App integration
 **Companion docs:** `docs/api/api-design.md` (REST surface), `docs/database/README.md`

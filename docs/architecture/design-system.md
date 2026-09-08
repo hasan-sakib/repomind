@@ -105,6 +105,31 @@ Project-specific composites, all under `components/shell/` unless noted:
   Phase 2 replaced both with flat routes, an organization switcher, and
   real API data).
 
+## Compact panel pattern (Phase 3)
+
+Introduced on the repository overview page
+(`(dashboard)/repositories/[repositoryId]/page.tsx`) for grouped list data
+(recent commits, open pull requests, open issues) — the reference case for
+the project's "no giant dashboard cards" rule:
+
+- A metadata **strip**, not stat cards: repo language/stars/forks/branch/
+  last-sync all sit inline in one bordered row
+  (`flex flex-wrap items-center gap-x-4 ... rounded-lg border`), not as
+  separate padded cards each showing one number.
+- A **bordered list panel** (`OverviewSection` in that file) for each
+  grouped collection: a small header (icon + title + count, not a large
+  card title), then a `divide-y` list of dense rows — never a shadcn
+  `Card` with its default padding for this kind of repeated-row content.
+  Reuse this pattern (not `Card`) for any future page showing "N items of
+  the same shape" (a status badge's `StatusBadge`-style component,
+  `components/repositories/status-badge.tsx`, is the model for per-domain
+  status badges — add one per new status enum rather than inlining
+  variant-selection logic at each call site).
+- Empty state within a panel is a single centered muted line
+  (`emptyLabel`), not the full `EmptyState` component — `EmptyState` is
+  for a whole page/section having nothing, not one column of a
+  multi-column layout.
+
 ## Loading, empty, and error state convention
 
 - **Loading**: route-segment `loading.tsx` renders skeletons shaped like

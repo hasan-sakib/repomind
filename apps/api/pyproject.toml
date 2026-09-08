@@ -15,7 +15,7 @@ dependencies = [
     "psycopg[binary]>=3.2.3",
     "anthropic>=0.39.0",
     "httpx>=0.27.2",
-    "pyjwt>=2.9.0",
+    "pyjwt[crypto]>=2.9.0",
     "python-multipart>=0.0.12",
     "argon2-cffi>=23.1.0",
     "pydantic[email]>=2.9.0",
@@ -41,6 +41,9 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 # Alembic autogenerate produces long lines it doesn't format for us — never
 # hand-edit these for style, only for correctness.
 "app/db/migrations/versions/*.py" = ["E501"]
+# Settings must be populated (env vars, a generated test RSA key) before
+# importing app modules that read them at import time via get_settings().
+"tests/conftest.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.12"
@@ -50,3 +53,9 @@ plugins = ["pydantic.mypy"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+# One event loop for the whole session, matching production (one loop for
+# the process lifetime). Without this, pytest-asyncio's default per-test
+# loop breaks any code — like app.db.session's module-level engine, used
+# by background sync tasks — that isn't re-created per test via a fixture.
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"

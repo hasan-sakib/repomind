@@ -25,10 +25,18 @@ class Settings(BaseSettings):
     # Public URL of the frontend, used to build redirect/email links.
     frontend_url: str = "http://localhost:3000"
 
-    # GitHub OAuth App credentials (login only — see docs/architecture/backend-architecture.md;
-    # a separate GitHub App for repository access/installation is a later phase's concern).
+    # GitHub OAuth App credentials — login only. See
+    # docs/architecture/0002-auth-and-multi-tenancy.md for why this is a
+    # separate credential set from the GitHub App below.
     github_client_id: str = ""
     github_client_secret: str = ""
+
+    # GitHub App credentials — repository access (installation tokens) and
+    # webhooks only, never user login. See
+    # docs/architecture/0003-github-integration.md.
+    github_app_id: str = ""
+    github_app_slug: str = ""
+    github_app_private_key: str = ""
     github_webhook_secret: str = ""
 
     # Session / auth signing.

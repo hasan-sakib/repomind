@@ -71,3 +71,23 @@ class UserNotFoundError(AppError):
 class MemberAlreadyExistsError(AppError):
     status_code = 409
     code = "member_already_exists"
+
+
+class InstallationNotFoundError(AppError):
+    status_code = 404
+    code = "installation_not_found"
+
+
+class RepositoryNotFoundError(AppError):
+    status_code = 404
+    code = "repository_not_found"
+
+
+class RepositoryAlreadyConnectedError(AppError):
+    status_code = 409
+    code = "repository_already_connected"
+
+
+class WebhookVerificationError(AppError):
+    status_code = 401
+    code = "webhook_verification_failed"

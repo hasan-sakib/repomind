@@ -9,11 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security.tokens import InvalidTokenError, decode_access_token
 from app.db.session import get_db_session
 from app.domain.organization_member import OrganizationMember
+from app.domain.repository import Repository
 from app.domain.role import Role
 from app.domain.session import Session
 from app.domain.user import User
 from app.repositories import session_repository, user_repository
-from app.services import organization_service
+from app.services import organization_service, repository_service
 from app.services.exceptions import CsrfError, NotAuthenticatedError
 
 SESSION_COOKIE_NAME = "rm_session"
@@ -88,3 +89,16 @@ def require_organization_role(
         )
 
     return dependency
+
+
+async def require_repository_access(
+    db: DbSession,
+    user: Annotated[User, Depends(get_current_user)],
+    repository_id: Annotated[uuid.UUID, Path()],
+) -> Repository:
+    """Loads the {repository_id} path param, enforcing that the caller has
+    a RepositoryMembership row for it — see
+    repository_service.require_repository_access."""
+    return await repository_service.require_repository_access(
+        db, repository_id=repository_id, user_id=user.id
+    )

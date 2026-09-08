@@ -101,9 +101,7 @@ async def refresh(
     new_access_token, new_refresh_token = await auth_service.refresh_session(
         db, raw_refresh_token=rm_refresh
     )
-    set_session_cookies(
-        response, access_token=new_access_token, refresh_token=new_refresh_token
-    )
+    set_session_cookies(response, access_token=new_access_token, refresh_token=new_refresh_token)
 
 
 @router.get("/me", response_model=MeResponse)
@@ -122,14 +120,10 @@ async def request_password_reset(body: PasswordResetRequestRequest, db: DbSessio
 
 @router.post("/password-reset/confirm", status_code=204)
 async def confirm_password_reset(body: PasswordResetConfirmRequest, db: DbSession) -> None:
-    await auth_service.confirm_password_reset(
-        db, token=body.token, new_password=body.new_password
-    )
+    await auth_service.confirm_password_reset(db, token=body.token, new_password=body.new_password)
 
 
-@router.post(
-    "/email/verify/request", status_code=204, dependencies=[Depends(require_csrf_header)]
-)
+@router.post("/email/verify/request", status_code=204, dependencies=[Depends(require_csrf_header)])
 async def request_email_verification(
     db: DbSession, user: Annotated[User, Depends(get_current_user)]
 ) -> None:
@@ -148,9 +142,7 @@ async def confirm_email_verification(
 async def github_login(request: Request) -> RedirectResponse:
     state = secrets.token_urlsafe(24)
     redirect = RedirectResponse(
-        github_oauth.build_authorize_url(
-            redirect_uri=_github_redirect_uri(request), state=state
-        )
+        github_oauth.build_authorize_url(redirect_uri=_github_redirect_uri(request), state=state)
     )
     redirect.set_cookie(
         GITHUB_STATE_COOKIE,

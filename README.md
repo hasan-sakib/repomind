@@ -6,17 +6,20 @@ insight grounded in the actual code — not a generic AI chat wrapper.
 
 ## Status
 
-Authentication and multi-tenancy foundation is complete and tested: email/
-password auth, GitHub OAuth login, organizations with role-based
-authorization (owner/admin/developer/viewer), password reset, email
-verification, and a real dashboard shell — all backed by a real database
-and 39 passing backend tests. Repository connection and AI chat Q&A (the
-core product loop) are the next phase. See
-[`docs/product/README.md`](docs/product/README.md) for scope,
-[`docs/architecture/0001-foundation.md`](docs/architecture/0001-foundation.md)
-for the initial architecture, and
+Authentication, multi-tenancy, and GitHub integration are complete and
+tested: email/password auth, GitHub OAuth login, organizations with
+role-based authorization (owner/admin/developer/viewer), password reset,
+email verification, a GitHub App connection flow, and a repository
+overview (metadata, branches, commits, pull requests, issues, secure
+idempotent webhook sync) — all backed by a real database and 61 passing
+backend tests. AI-powered chat Q&A over connected repositories (the core
+product loop) is next. See [`docs/product/README.md`](docs/product/README.md)
+for scope, [`docs/architecture/0001-foundation.md`](docs/architecture/0001-foundation.md)
+for the initial architecture,
 [`docs/architecture/0002-auth-and-multi-tenancy.md`](docs/architecture/0002-auth-and-multi-tenancy.md)
-for what this phase actually built.
+for the auth/tenancy phase, and
+[`docs/architecture/0003-github-integration.md`](docs/architecture/0003-github-integration.md)
+for the GitHub integration phase.
 
 ## Stack
 

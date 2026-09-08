@@ -50,3 +50,88 @@ export interface MeResponse {
   user: User;
   organizations: OrganizationMembership[];
 }
+
+export type RepositoryStatus = "pending" | "syncing" | "ready" | "error";
+
+export const REPOSITORY_STATUS_LABELS: Record<RepositoryStatus, string> = {
+  pending: "Pending",
+  syncing: "Syncing",
+  ready: "Ready",
+  error: "Error",
+};
+
+export interface Installation {
+  id: string;
+  account_login: string;
+  account_type: string;
+}
+
+export interface AvailableRepository {
+  github_repo_id: number;
+  full_name: string;
+  name: string;
+  private: boolean;
+  description: string | null;
+}
+
+export interface Repository {
+  id: string;
+  full_name: string;
+  name: string;
+  description: string | null;
+  language: string | null;
+  stargazers_count: number;
+  forks_count: number;
+  default_branch: string;
+  private: boolean;
+  html_url: string;
+  status: RepositoryStatus;
+  sync_error: string | null;
+  last_synced_at: string | null;
+  connected_at: string;
+}
+
+export interface Branch {
+  name: string;
+  commit_sha: string;
+  is_default: boolean;
+}
+
+export interface Commit {
+  sha: string;
+  message: string;
+  author_name: string | null;
+  author_login: string | null;
+  html_url: string;
+  authored_at: string;
+}
+
+export interface PullRequest {
+  number: number;
+  title: string;
+  state: string;
+  author_login: string | null;
+  html_url: string;
+  github_created_at: string;
+  github_updated_at: string;
+  closed_at: string | null;
+  merged_at: string | null;
+}
+
+export interface Issue {
+  number: number;
+  title: string;
+  state: string;
+  author_login: string | null;
+  html_url: string;
+  github_created_at: string;
+  github_updated_at: string;
+  closed_at: string | null;
+}
+
+export interface RepositoryOverview {
+  repository: Repository;
+  recent_commits: Commit[];
+  open_pull_requests: PullRequest[];
+  open_issues: Issue[];
+}

@@ -11,6 +11,8 @@ from app.repositories import (
     audit_log_repository,
     organization_member_repository,
     organization_repository,
+    repository_membership_repository,
+    repository_repository,
     user_repository,
 )
 from app.services.exceptions import (
@@ -85,9 +87,7 @@ async def require_role(
     return member
 
 
-async def list_members(
-    db: AsyncSession, organization_id: uuid.UUID
-) -> list[OrganizationMember]:
+async def list_members(db: AsyncSession, organization_id: uuid.UUID) -> list[OrganizationMember]:
     """Returns memberships with `.user` eagerly loaded."""
     return await organization_member_repository.list_for_organization(db, organization_id)
 
@@ -117,6 +117,17 @@ async def add_member(
     member = organization_member_repository.create(
         db, organization_id=organization_id, user_id=target_user.id, role=role
     )
+    await db.flush()
+
+    # New members automatically get visibility into every repository
+    # already connected to this organization — see
+    # app/domain/repository_membership.py for why this is auto-maintained
+    # rather than manually managed in this phase.
+    for repository in await repository_repository.list_for_organization(db, organization_id):
+        repository_membership_repository.create(
+            db, repository_id=repository.id, user_id=target_user.id
+        )
+
     audit_log_repository.create(
         db,
         action="organization.member.added",
