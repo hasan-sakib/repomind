@@ -28,6 +28,13 @@ class AIProvider(ABC):
     later) can be swapped without touching business logic.
     """
 
+    @property
+    @abstractmethod
+    def model(self) -> str:
+        """The concrete model identifier in use — recorded on AiRun rows
+        (app/services/chat_service.py) for observability."""
+        ...
+
     @abstractmethod
     async def complete(
         self,

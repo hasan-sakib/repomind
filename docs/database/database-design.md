@@ -1,6 +1,6 @@
 # Database Design
 
-**Status:** Accepted (as the Phase 1 target schema for AI ingestion) — **partially superseded**: ingestion tables were built differently in Phase 4 (ADR 0004); retrieval/search tables are still not built
+**Status:** Accepted (as the Phase 1 target schema for AI ingestion) — **superseded**: ingestion tables were built differently in Phase 4 (ADR 0004), and retrieval/chat tables were built differently in Phase 5 (ADR 0005)
 **Date:** 2026-09-08
 **Depends on:** `docs/architecture/0001-foundation.md` (async SQLAlchemy + Alembic setup)
 **Cross-references:** `docs/architecture/ai-architecture.md` (ingestion/retrieval pipelines
@@ -23,10 +23,13 @@ that read and write `code_chunks` and `ingestion_jobs`), `backend-architecture.m
 > `code_chunks`, not an inline `embedding` column as sketched below),
 > `indexing_jobs`, `indexing_errors` (ADR 0004) — materially different
 > from the `code_chunks`/`ingestion_jobs` shape sketched in this document
-> too. Treat this document as the plan for the still-unbuilt
-> **retrieval/search** pipeline (pgvector cosine-search chat context), and
-> the three ADRs as the current, actually-applied migrations for
-> everything else.
+> too. Phase 5 then shipped the real retrieval/chat schema —
+> `conversations`, `messages`, `ai_runs`, `retrieval_results` (ADR 0005)
+> — where `retrieval_results` snapshots file path/line numbers rather
+> than only holding a live foreign key, deliberately unlike anything
+> sketched here. Treat this document as historical context for how the
+> schema was originally planned, and the four ADRs as the current,
+> actually-applied migrations.
 
 PostgreSQL, accessed via async SQLAlchemy (`asyncpg` driver, per ADR 0001).
 The `pgvector` extension is required for `code_chunks.embedding` and is

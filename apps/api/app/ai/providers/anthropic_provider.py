@@ -15,6 +15,10 @@ class AnthropicProvider(AIProvider):
         self._client = AsyncAnthropic(api_key=api_key)
         self._model = model
 
+    @property
+    def model(self) -> str:
+        return self._model
+
     async def complete(
         self,
         messages: list[ChatMessage],

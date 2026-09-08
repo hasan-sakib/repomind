@@ -20,6 +20,7 @@ from sqlalchemy.orm import selectinload
 
 from app.ai.embedding_provider import EmbeddingProvider
 from app.core.config import Settings, get_settings
+from app.domain.code_file import ImportRecord
 from app.domain.indexing_job import IndexingJob
 from app.domain.indexing_status import IndexingJobStatus, IndexingStage
 from app.domain.repository import Repository
@@ -178,6 +179,9 @@ async def _discover_and_chunk(
                 )
                 continue
 
+            import_records: list[ImportRecord] = [
+                {"text": imp.text, "line": imp.line} for imp in extraction.imports
+            ]
             if existing is not None:
                 await code_symbol_repository.delete_for_file(db, existing.id)
                 await code_chunk_repository.delete_for_file(db, existing.id)
@@ -187,7 +191,7 @@ async def _discover_and_chunk(
                     size_bytes=file.size_bytes,
                     content_hash=content_hash,
                     commit_sha=job.commit_sha,
-                    imports=extraction.imports,
+                    imports=import_records,
                     indexed_at=datetime.now(UTC),
                 )
                 code_file = existing
@@ -200,7 +204,7 @@ async def _discover_and_chunk(
                     size_bytes=file.size_bytes,
                     content_hash=content_hash,
                     commit_sha=job.commit_sha,
-                    imports=extraction.imports,
+                    imports=import_records,
                     indexed_at=datetime.now(UTC),
                 )
             await db.flush()

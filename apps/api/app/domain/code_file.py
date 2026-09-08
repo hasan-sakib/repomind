@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import JSONB, UUID
@@ -13,6 +13,15 @@ if TYPE_CHECKING:
     from app.domain.code_chunk import CodeChunk
     from app.domain.code_symbol import CodeSymbol
     from app.domain.repository import Repository
+
+
+class ImportRecord(TypedDict):
+    """One import statement, with the line it appears on — used by
+    app/retrieval/dependency_graph.py to give a dependency citation a real
+    line number instead of just "somewhere in this file"."""
+
+    text: str
+    line: int
 
 
 class CodeFile(UUIDPrimaryKeyMixin, Base):
@@ -35,7 +44,7 @@ class CodeFile(UUIDPrimaryKeyMixin, Base):
     size_bytes: Mapped[int] = mapped_column(Integer, nullable=False)
     content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     commit_sha: Mapped[str] = mapped_column(String(40), nullable=False)
-    imports: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    imports: Mapped[list[ImportRecord]] = mapped_column(JSONB, nullable=False, default=list)
     indexed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
     repository: Mapped["Repository"] = relationship(back_populates="code_files")

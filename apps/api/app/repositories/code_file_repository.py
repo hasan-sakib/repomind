@@ -5,7 +5,7 @@ from sqlalchemy import delete as sa_delete
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.code_file import CodeFile
+from app.domain.code_file import CodeFile, ImportRecord
 
 
 async def list_for_repository(db: AsyncSession, repository_id: uuid.UUID) -> list[CodeFile]:
@@ -29,7 +29,7 @@ def create(
     size_bytes: int,
     content_hash: str,
     commit_sha: str,
-    imports: list[str],
+    imports: list[ImportRecord],
     indexed_at: datetime,
 ) -> CodeFile:
     code_file = CodeFile(
@@ -53,7 +53,7 @@ def update(
     size_bytes: int,
     content_hash: str,
     commit_sha: str,
-    imports: list[str],
+    imports: list[ImportRecord],
     indexed_at: datetime,
 ) -> None:
     code_file.language = language

@@ -12,9 +12,18 @@ const SEGMENT_LABELS: Record<string, string> = {
   repositories: "Repositories",
   connect: "Connect",
   indexing: "Indexing",
+  chat: "Chat",
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// What a UUID segment means depends on what precedes it — a repository id
+// right after "repositories" is that repository's overview, but a UUID
+// after "chat" is a specific conversation, not another "Overview" page.
+const UUID_LABEL_BY_PARENT: Record<string, string> = {
+  repositories: "Overview",
+  chat: "Conversation",
+};
 
 // The "repositories" URL segment has no page of its own — the list lives
 // at /dashboard — so its breadcrumb must point there instead of forming
@@ -29,7 +38,10 @@ export function Breadcrumbs() {
 
   const crumbs = segments.map((segment, index) => {
     const href = SEGMENT_HREF_OVERRIDES[segment] ?? `/${segments.slice(0, index + 1).join("/")}`;
-    const label = UUID_PATTERN.test(segment) ? "Overview" : (SEGMENT_LABELS[segment] ?? segment);
+    const parent = segments[index - 1];
+    const label = UUID_PATTERN.test(segment)
+      ? (UUID_LABEL_BY_PARENT[parent] ?? "Overview")
+      : (SEGMENT_LABELS[segment] ?? segment);
     return { href, label };
   });
 

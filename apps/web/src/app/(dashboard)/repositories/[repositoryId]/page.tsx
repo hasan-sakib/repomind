@@ -10,6 +10,7 @@ import {
   GitPullRequestIcon,
   CircleDotIcon,
   DatabaseZapIcon,
+  MessageSquareIcon,
   RefreshCwIcon,
   StarIcon,
   GitForkIcon,
@@ -99,6 +100,10 @@ export default function RepositoryOverviewPage({
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <Button size="sm" render={<Link href={`/repositories/${repositoryId}/chat`} />}>
+            <MessageSquareIcon className="size-3.5" />
+            Chat
+          </Button>
           <Button
             variant="outline"
             size="sm"

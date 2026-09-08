@@ -15,8 +15,14 @@
 > /repositories/{id}/indexing-jobs`, `GET
 > /repositories/{id}/indexing-jobs/{jobId}` — see
 > `docs/architecture/0004-codebase-indexing.md`; the ingestion-job
-> endpoints sketched below (and the chat/retrieval endpoints, which read
-> `CodeChunk` rows for citations) remain unbuilt design.
+> endpoints sketched below remain unbuilt design. Phase 5 shipped the
+> real chat/retrieval API — `POST`/`GET
+> /repositories/{id}/conversations`, `GET .../conversations/{id}`,
+> `POST .../messages` and `.../messages/{id}/regenerate` (both
+> Server-Sent Events streams, not plain JSON responses), `PATCH
+> .../messages/{id}/feedback` — see
+> `docs/architecture/0005-ai-rag-engine.md`, which is the source of
+> truth for the real chat API surface and streaming event shape.
 
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** Full REST surface under `/api/v1`, error shape, pagination, rate

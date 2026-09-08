@@ -24,6 +24,22 @@ async def existing_shas(db: AsyncSession, repository_id: uuid.UUID) -> set[str]:
     return set(result.scalars().all())
 
 
+async def get_urls_by_shas(
+    db: AsyncSession, *, repository_id: uuid.UUID, shas: set[str]
+) -> dict[str, str]:
+    """Used to attach a clickable GitHub link to a git-history source
+    reference (app/schemas/chat.py) without denormalizing the URL onto
+    every RetrievalResult row."""
+    if not shas:
+        return {}
+    result = await db.execute(
+        select(Commit.sha, Commit.html_url).where(
+            Commit.repository_id == repository_id, Commit.sha.in_(shas)
+        )
+    )
+    return {sha: html_url for sha, html_url in result.all()}
+
+
 def create(
     db: AsyncSession,
     *,

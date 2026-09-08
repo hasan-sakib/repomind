@@ -101,3 +101,18 @@ class RepositoryNotSyncedError(AppError):
 class IndexingJobNotFoundError(AppError):
     status_code = 404
     code = "indexing_job_not_found"
+
+
+class ConversationNotFoundError(AppError):
+    status_code = 404
+    code = "conversation_not_found"
+
+
+class MessageNotFoundError(AppError):
+    status_code = 404
+    code = "message_not_found"
+
+
+class RegenerateNotAllowedError(AppError):
+    status_code = 409
+    code = "regenerate_not_allowed"

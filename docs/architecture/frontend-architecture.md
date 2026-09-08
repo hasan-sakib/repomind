@@ -10,7 +10,21 @@
 > connected-repositories list — see
 > `docs/architecture/0003-github-integration.md`. The data-fetching
 > split, state-management reasoning, and UX conventions (loading/empty/
-> error states) below still describe what was actually built.
+> error states) below still describe what was actually built. The chat
+> routing sketch in §3 (`chat/page.tsx` / `chat/[sessionId]/page.tsx`,
+> `ChatSession`, `/chat/sessions/{id}/...` endpoints) and the
+> `useChatStream` hook in §4 anticipated the real shape closely —
+> Phase 5 built the same two-route pattern under `/repositories/
+> {id}/chat/` and `/repositories/{id}/chat/{conversationId}`, and SSE
+> parsed by hand over `fetch` rather than `EventSource`, for the same
+> reason given here (a POST body + custom CSRF header `EventSource`
+> can't send) — but with different names throughout (`Conversation`
+> not `ChatSession`, `/conversations/{id}/messages` not `/chat/
+> sessions/{id}/messages`) and the streaming logic inlined into
+> `components/chat/chat-shell.tsx` rather than factored into a
+> standalone `useChatStream` hook. See
+> `docs/architecture/0005-ai-rag-engine.md` for the real API surface,
+> component list, and the reasoning behind each divergence.
 
 **Status:** Design (Phase 1) — targets implementation in Phase 2
 **Scope:** `apps/web` routing, auth-aware layout, data-fetching split between

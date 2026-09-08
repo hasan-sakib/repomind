@@ -216,3 +216,54 @@ export interface TriggerIndexingResponse {
   started: boolean;
   job: IndexingJob;
 }
+
+export type MessageRole = "user" | "assistant";
+
+export type MessageFeedback = "up" | "down";
+
+export type QueryIntent = "explain" | "locate" | "dependency" | "history" | "general";
+
+export const QUERY_INTENT_LABELS: Record<QueryIntent, string> = {
+  explain: "Explaining",
+  locate: "Locating",
+  dependency: "Dependency lookup",
+  history: "History search",
+  general: "General",
+};
+
+export type RetrievalSourceType = "vector" | "dependency" | "git_history";
+
+export interface SourceReference {
+  source_type: RetrievalSourceType;
+  rank: number;
+  score: number | null;
+  file_path: string | null;
+  start_line: number | null;
+  end_line: number | null;
+  symbol_name: string | null;
+  commit_sha: string | null;
+  commit_url: string | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: MessageRole;
+  content: string;
+  feedback: MessageFeedback | null;
+  created_at: string;
+  intent: QueryIntent | null;
+  sources: SourceReference[];
+}
+
+export interface Conversation {
+  id: string;
+  repository_id: string;
+  title: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ConversationDetail {
+  conversation: Conversation;
+  messages: ChatMessage[];
+}

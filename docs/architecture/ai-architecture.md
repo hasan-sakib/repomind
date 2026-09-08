@@ -1,6 +1,6 @@
 # AI Architecture
 
-**Status:** Accepted — **superseded in part**, see note below
+**Status:** Accepted — **superseded**, see note below
 **Date:** 2026-09-08
 **Depends on:** `docs/architecture/0001-foundation.md` (provider abstraction pattern, layered backend)
 **Cross-references:** `docs/database/database-design.md` (schema this pipeline reads/writes),
@@ -15,9 +15,14 @@
 > truth for the real pipeline, table names, and worker task shape. The
 > `AIProvider`/`EmbeddingProvider` abstraction pattern and the Voyage/
 > `voyage-code-3` reasoning in section 1 below held up and were implemented
-> as planned. **Retrieval/search** (section on pgvector cosine-search chat
-> context) is still unbuilt — that section remains a plan, not a
-> description of a built system.
+> as planned — Phase 5 additionally added a `Reranker` abstraction
+> alongside them, not anticipated here. **Retrieval/search** (section on
+> pgvector cosine-search chat context) was built in Phase 5, materially
+> differently from this section's plan — a LangGraph-orchestrated hybrid
+> pipeline (vector + import-based dependency graph + git-history keyword
+> search, reranked), not a single pgvector query — see
+> `docs/architecture/0005-ai-rag-engine.md`, the source of truth for what
+> was actually built.
 
 This document covers the two things Phase 1 actually builds AI logic around:
 ingesting a connected repository into searchable, embedded chunks, and

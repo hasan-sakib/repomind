@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from app.domain.branch import Branch
     from app.domain.code_file import CodeFile
     from app.domain.commit import Commit
+    from app.domain.conversation import Conversation
     from app.domain.github_installation import GitHubInstallation
     from app.domain.indexing_job import IndexingJob
     from app.domain.issue import Issue
@@ -89,3 +90,4 @@ class Repository(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):
         back_populates="repository", cascade="all, delete-orphan"
     )
     indexing_jobs: Mapped[list["IndexingJob"]] = relationship(cascade="all, delete-orphan")
+    conversations: Mapped[list["Conversation"]] = relationship(cascade="all, delete-orphan")

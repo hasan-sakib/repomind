@@ -42,7 +42,10 @@ def test_python_symbols_and_chunks_follow_ast_boundaries() -> None:
         ("method", "greet"),
         ("function", "standalone"),
     }
-    assert result.imports == ["import os", "from typing import List"]
+    assert [(i.text, i.line) for i in result.imports] == [
+        ("import os", 1),
+        ("from typing import List", 2),
+    ]
 
     greeter = next(s for s in result.symbols if s.name == "Greeter")
     assert greeter.docstring == "Greets people."

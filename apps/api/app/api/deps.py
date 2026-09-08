@@ -7,6 +7,10 @@ from arq.connections import ArqRedis
 from fastapi import Cookie, Depends, Header, Path, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.embedding_provider import EmbeddingProvider
+from app.ai.factory import get_ai_provider, get_embedding_provider, get_reranker
+from app.ai.provider import AIProvider
+from app.ai.reranker import Reranker
 from app.core.security.tokens import InvalidTokenError, decode_access_token
 from app.db.session import get_db_session
 from app.domain.organization_member import OrganizationMember
@@ -23,6 +27,14 @@ REFRESH_COOKIE_NAME = "rm_refresh"
 CSRF_HEADER_VALUE = "RepoMind"
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
+
+# AIProvider/EmbeddingProvider/Reranker are process-wide singletons
+# (@lru_cache in app/ai/factory.py) wrapped as dependencies purely so
+# route handlers can depend on the abstraction and tests can override
+# them — matches the ArqPool/DbSession pattern below.
+ChatProvider = Annotated[AIProvider, Depends(get_ai_provider)]
+QueryEmbeddingProvider = Annotated[EmbeddingProvider, Depends(get_embedding_provider)]
+ChatReranker = Annotated[Reranker, Depends(get_reranker)]
 
 
 def get_arq_pool(request: Request) -> ArqRedis:

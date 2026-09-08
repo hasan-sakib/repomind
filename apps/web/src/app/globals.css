@@ -146,3 +146,36 @@
     @apply font-sans;
   }
 }
+
+/* Chat markdown code-block syntax highlighting (rehype-highlight /
+   highlight.js class names). Deliberately restrained — comments and
+   strings are the only things that get a color, everything else stays
+   the same monochrome foreground as the rest of the design system, so
+   code blocks read as precise rather than "rainbow syntax highlighting". */
+.hljs-comment,
+.hljs-quote {
+  color: var(--color-muted-foreground);
+  font-style: italic;
+}
+.hljs-string,
+.hljs-doctag,
+.hljs-regexp {
+  color: var(--color-brand);
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-title,
+.hljs-section,
+.hljs-name {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-type,
+.hljs-attr,
+.hljs-symbol,
+.hljs-number {
+  color: var(--color-muted-foreground);
+}

@@ -54,9 +54,16 @@ class Settings(BaseSettings):
     require_email_verification: bool = False
 
     # AI provider configuration. Provider is swappable — see app/ai/provider.py.
-    ai_provider: Literal["anthropic"] = "anthropic"
+    ai_provider: Literal["anthropic", "ollama"] = "anthropic"
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-opus-5"
+
+    # Ollama — a free, local alternative to Anthropic (app/ai/providers/
+    # ollama_provider.py). No API key: `host` just needs a running
+    # `ollama serve` reachable at that address, and `model` needs to
+    # already be pulled (`ollama pull <model>`) there.
+    ollama_host: str = "http://localhost:11434"
+    ollama_model: str = "qwen3:4b"
 
     # Embedding provider — see app/ai/embedding_provider.py. Anthropic has no
     # first-party embeddings API; Voyage is Anthropic's recommended partner
@@ -78,6 +85,17 @@ class Settings(BaseSettings):
     indexing_max_file_size_bytes: int = 500_000
     indexing_max_files_per_repository: int = 3000
     indexing_max_chunk_lines: int = 200
+
+    # Reranker — see app/ai/reranker.py and docs/architecture/0005-ai-rag-engine.md.
+    reranker_provider: Literal["voyage"] = "voyage"
+    voyage_rerank_model: str = "rerank-2.5"
+
+    # RAG pipeline tunables (app/retrieval/graph.py).
+    rag_vector_candidates: int = 24  # fetched from pgvector before reranking
+    rag_context_chunks: int = 8  # kept after reranking, sent to the LLM
+    rag_dependency_limit: int = 12
+    rag_git_history_limit: int = 5
+    rag_max_context_chars: int = 24_000
 
 
 @lru_cache

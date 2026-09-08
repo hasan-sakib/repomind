@@ -9,9 +9,7 @@ class VoyageEmbeddingProvider(EmbeddingProvider):
         self._model = model
         self._output_dimension = output_dimension
 
-    async def embed(
-        self, texts: list[str], *, input_type: EmbeddingInputType
-    ) -> EmbeddingResult:
+    async def embed(self, texts: list[str], *, input_type: EmbeddingInputType) -> EmbeddingResult:
         response = await self._client.embed(
             texts=texts,
             model=self._model,

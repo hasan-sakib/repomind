@@ -31,6 +31,12 @@ def _text(node: Node) -> str:
 
 
 @dataclass(frozen=True, slots=True)
+class ExtractedImport:
+    text: str
+    line: int
+
+
+@dataclass(frozen=True, slots=True)
 class ExtractedSymbol:
     symbol_type: str
     name: str
@@ -56,7 +62,7 @@ class ExtractedChunk:
 class ExtractionResult:
     symbols: list[ExtractedSymbol]
     chunks: list[ExtractedChunk]
-    imports: list[str]
+    imports: list[ExtractedImport]
 
 
 def _make_chunk(
@@ -139,13 +145,15 @@ def _walk(
     language: str,
     symbols: list[ExtractedSymbol],
     chunks: list[ExtractedChunk],
-    imports: list[str],
+    imports: list[ExtractedImport],
     parent_index: int | None,
     ancestor_is_class: bool,
 ) -> None:
     for child in node.named_children:
         if child.type in config.import_nodes:
-            imports.append(_text(child).strip())
+            imports.append(
+                ExtractedImport(text=_text(child).strip(), line=child.start_point[0] + 1)
+            )
             continue
 
         if child.type not in config.symbol_nodes:
@@ -277,7 +285,7 @@ def extract(
 
     symbols: list[ExtractedSymbol] = []
     chunks: list[ExtractedChunk] = []
-    imports: list[str] = []
+    imports: list[ExtractedImport] = []
     _walk(
         parse_result.root,
         config,
