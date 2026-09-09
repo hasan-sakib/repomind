@@ -13,6 +13,7 @@ from app.api.v1.routes import (
     repositories,
     users,
     webhooks,
+    websocket,
 )
 
 api_router = APIRouter()
@@ -30,3 +31,4 @@ api_router.include_router(pull_requests.router)
 api_router.include_router(onboarding.router)
 api_router.include_router(analytics.router)
 api_router.include_router(webhooks.router)
+api_router.include_router(websocket.router)

@@ -27,6 +27,8 @@ from app.core.config import Settings, get_settings
 from app.db.session import async_session_factory
 from app.domain.analytics_snapshot import AnalyticsSnapshot, DailyPRIssueRecord
 from app.domain.repository import Repository
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
 from app.integrations.github import app_client, rest_client
 from app.integrations.github.schemas import GitHubPullRequestFile
 from app.repositories import (
@@ -35,6 +37,7 @@ from app.repositories import (
     issue_repository,
     pull_request_repository,
 )
+from app.schemas.analytics import AnalyticsSnapshotPublic
 from app.services.exceptions import AnalyticsSnapshotNotFoundError, RepositoryNotSyncedError
 
 logger = logging.getLogger("repomind.analytics")
@@ -97,6 +100,30 @@ async def run_generation(snapshot_id: uuid.UUID) -> None:
                 snapshot, finished_at=datetime.now(UTC), error=str(exc)
             )
             await db.commit()
+            await _publish_failure(db, snapshot)
+
+
+async def _publish_failure(db: AsyncSession, snapshot: AnalyticsSnapshot) -> None:
+    """Best-effort — see pr_analysis_service._publish_failure."""
+    try:
+        repository = await db.get(Repository, snapshot.repository_id)
+        if repository is None:
+            return
+        await publish_state(
+            category=EventCategory.AI_GENERATION,
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            resource="analytics_snapshot",
+            data=AnalyticsSnapshotPublic.from_snapshot(snapshot).model_dump(mode="json"),
+        )
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"Analytics generation failed for {repository.full_name}",
+            level="error",
+        )
+    except Exception:  # noqa: BLE001 — see docstring
+        logger.exception("Failed to publish analytics failure event for %s", snapshot.id)
 
 
 async def _fetch_hotspot_commit_files(
@@ -125,6 +152,13 @@ async def _run_generation_body(
 
     analytics_snapshot_repository.mark_running(snapshot, started_at=datetime.now(UTC))
     await db.commit()
+    await publish_state(
+        category=EventCategory.AI_GENERATION,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="analytics_snapshot",
+        data=AnalyticsSnapshotPublic.from_snapshot(snapshot).model_dump(mode="json"),
+    )
 
     installation = await github_installation_repository.get_by_id(db, repository.installation_id)
     if installation is None:
@@ -193,3 +227,16 @@ async def _run_generation_body(
         pr_sample_size=len(pull_requests),
     )
     await db.commit()
+    await publish_state(
+        category=EventCategory.AI_GENERATION,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="analytics_snapshot",
+        data=AnalyticsSnapshotPublic.from_snapshot(snapshot).model_dump(mode="json"),
+    )
+    await publish_notification(
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        title=f"Analytics ready for {repository.full_name}",
+        level="success",
+    )

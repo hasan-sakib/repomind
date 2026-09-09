@@ -26,6 +26,7 @@ import { ErrorState } from "@/components/error-state";
 import { RepositoryStatusBadge } from "@/components/repositories/status-badge";
 import { getRepositoryOverview, syncRepositoryNow } from "@/lib/api/repositories";
 import { formatRelativeTime } from "@/lib/format-time";
+import { useRealtime } from "@/lib/realtime-context";
 
 export default function RepositoryOverviewPage({
   params,
@@ -35,11 +36,18 @@ export default function RepositoryOverviewPage({
   const { repositoryId } = use(params);
   const queryClient = useQueryClient();
   const [justTriggeredSync, setJustTriggeredSync] = useState(false);
+  const { status: connectionStatus } = useRealtime();
 
   const overviewQuery = useQuery({
     queryKey: ["repository-overview", repositoryId],
     queryFn: () => getRepositoryOverview(repositoryId),
-    refetchInterval: (query) => (query.state.data?.repository.status === "syncing" ? 2000 : false),
+    // The real-time connection already pushes sync-status updates
+    // straight into this cache — polling is purely a fallback for when
+    // it isn't connected.
+    refetchInterval: (query) =>
+      connectionStatus !== "open" && query.state.data?.repository.status === "syncing"
+        ? 2000
+        : false,
   });
 
   const syncMutation = useMutation({

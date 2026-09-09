@@ -7,6 +7,8 @@ from sqlalchemy.orm import selectinload
 
 from app.db.session import async_session_factory
 from app.domain.repository import Repository
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
 from app.integrations.github import app_client, rest_client
 from app.repositories import (
     branch_repository,
@@ -15,8 +17,19 @@ from app.repositories import (
     pull_request_repository,
     repository_repository,
 )
+from app.schemas.github import RepositoryPublic
 
 logger = logging.getLogger("repomind.sync")
+
+
+async def _publish_sync_status(repository: Repository) -> None:
+    await publish_state(
+        category=EventCategory.SYNC,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="repository",
+        data=RepositoryPublic.from_repository(repository).model_dump(mode="json"),
+    )
 
 
 async def run_sync_in_background(repository_id: uuid.UUID) -> None:
@@ -47,6 +60,7 @@ async def sync_repository(db: AsyncSession, repository: Repository) -> None:
     docs/architecture/0003-github-integration.md)."""
     repository_repository.mark_syncing(repository)
     await db.commit()
+    await _publish_sync_status(repository)
 
     try:
         token = await app_client.get_installation_access_token(
@@ -60,11 +74,25 @@ async def sync_repository(db: AsyncSession, repository: Repository) -> None:
 
         repository_repository.mark_synced(repository, at=datetime.now(UTC))
         await db.commit()
+        await _publish_sync_status(repository)
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"{repository.full_name} synced",
+            level="success",
+        )
     except Exception as exc:  # noqa: BLE001 — must never crash the background task silently
         logger.exception("Sync failed for repository %s", repository.id)
         await db.rollback()
         repository_repository.mark_sync_failed(repository, error=str(exc))
         await db.commit()
+        await _publish_sync_status(repository)
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"Sync failed for {repository.full_name}",
+            level="error",
+        )
 
 
 async def _sync_metadata(db: AsyncSession, repository: Repository, token: str) -> None:

@@ -7,6 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.repository import Repository
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
 from app.integrations.github.schemas import GitHubIssue, GitHubPullRequest
 from app.repositories import (
     github_installation_repository,
@@ -17,6 +19,20 @@ from app.repositories import (
 )
 
 logger = logging.getLogger("repomind.webhooks")
+
+
+async def _resolve_organization_id(db: AsyncSession, payload: dict[str, Any]) -> uuid.UUID | None:
+    """Every GitHub App webhook delivery carries the installation it fired
+    for — this is the one piece of scoping info common to all event
+    types, including ones with no single repository (installation,
+    installation_repositories)."""
+    installation_id = payload.get("installation", {}).get("id")
+    if installation_id is None:
+        return None
+    installation = await github_installation_repository.get_by_github_installation_id(
+        db, installation_id
+    )
+    return installation.organization_id if installation is not None else None
 
 
 class WebhookResult:
@@ -69,10 +85,24 @@ async def process_webhook(
         await db.rollback()
         return WebhookResult(duplicate=True)
 
+    organization_id = await _resolve_organization_id(db, payload)
+
     try:
         result = await _dispatch(db, event_type=event_type, payload=payload)
         webhook_event_repository.mark_processed(event, at=datetime.now(UTC))
         await db.commit()
+        if organization_id is not None:
+            await publish_state(
+                category=EventCategory.WEBHOOK,
+                organization_id=organization_id,
+                repository_id=result.resync_repository_id,
+                resource="webhook_event",
+                data={
+                    "event_type": event_type,
+                    "delivery_id": github_delivery_id,
+                    "status": "processed",
+                },
+            )
         return result
     except Exception:
         logger.exception(
@@ -87,6 +117,23 @@ async def process_webhook(
                 refetched_event, error="processing error — see server logs", at=datetime.now(UTC)
             )
             await db.commit()
+        if organization_id is not None:
+            await publish_state(
+                category=EventCategory.WEBHOOK,
+                organization_id=organization_id,
+                repository_id=None,
+                resource="webhook_event",
+                data={
+                    "event_type": event_type,
+                    "delivery_id": github_delivery_id,
+                    "status": "failed",
+                },
+            )
+            await publish_notification(
+                organization_id=organization_id,
+                title=f"Webhook processing failed ({event_type})",
+                level="error",
+            )
         return WebhookResult()
 
 

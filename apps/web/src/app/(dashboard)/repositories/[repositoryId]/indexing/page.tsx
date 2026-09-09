@@ -17,6 +17,7 @@ import { IndexingStatusBadge } from "@/components/repositories/indexing-status-b
 import { listIndexingJobs, triggerIndexing } from "@/lib/api/indexing";
 import { getRepositoryOverview } from "@/lib/api/repositories";
 import { formatRelativeTime } from "@/lib/format-time";
+import { useRealtime } from "@/lib/realtime-context";
 import {
   INDEXING_STAGE_LABELS,
   INDEXING_STAGE_ORDER,
@@ -33,6 +34,7 @@ export default function RepositoryIndexingPage({
 }) {
   const { repositoryId } = use(params);
   const queryClient = useQueryClient();
+  const { status: connectionStatus } = useRealtime();
 
   const overviewQuery = useQuery({
     queryKey: ["repository-overview", repositoryId],
@@ -42,7 +44,11 @@ export default function RepositoryIndexingPage({
   const jobsQuery = useQuery({
     queryKey: ["indexing-jobs", repositoryId],
     queryFn: () => listIndexingJobs(repositoryId),
+    // The real-time connection already pushes progress updates straight
+    // into this cache (lib/realtime/apply-event.ts) — polling is purely
+    // a fallback for when it isn't connected.
     refetchInterval: (query) => {
+      if (connectionStatus === "open") return false;
       const latest = query.state.data?.[0];
       return latest && ACTIVE_STATUSES.has(latest.status) ? 2000 : false;
     },

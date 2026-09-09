@@ -562,3 +562,39 @@ export interface AnalyticsSnapshot {
   started_at: string | null;
   finished_at: string | null;
 }
+
+// Real-time infrastructure (app/events/ on the backend) — one WebSocket
+// per organization, see lib/realtime/connection.ts. `resource`/`data`
+// mirror the same Public-schema shapes above, keyed by `resource`; unlike
+// the REST responses, `pull_request_analysis` events also carry
+// `pull_request_number` since the resource id alone doesn't identify
+// which PR's cache entry to update.
+export type RealtimeEventCategory =
+  | "indexing"
+  | "sync"
+  | "webhook"
+  | "ai_generation"
+  | "notification";
+
+export type NotificationLevel = "info" | "success" | "error";
+
+export interface RealtimeEvent {
+  id: string;
+  category: RealtimeEventCategory;
+  organization_id: string;
+  repository_id: string | null;
+  resource: string | null;
+  data: Record<string, unknown> | null;
+  title: string | null;
+  level: NotificationLevel | null;
+  at: string;
+}
+
+export interface RealtimeNotification {
+  id: string;
+  title: string;
+  level: NotificationLevel;
+  repositoryId: string | null;
+  at: string;
+  read: boolean;
+}

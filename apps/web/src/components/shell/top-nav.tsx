@@ -4,6 +4,7 @@ import { MenuIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Breadcrumbs } from "@/components/shell/breadcrumbs";
+import { ConnectionStatus } from "@/components/shell/connection-status";
 import { NotificationsMenu } from "@/components/shell/notifications-menu";
 import { useShell } from "@/components/shell/shell-context";
 import { UserMenu } from "@/components/shell/user-menu";
@@ -45,6 +46,7 @@ export function TopNav() {
       >
         <SearchIcon className="size-4" />
       </Button>
+      <ConnectionStatus />
       <NotificationsMenu />
       <UserMenu />
     </header>

@@ -8,8 +8,8 @@ insight grounded in the actual code — not a generic AI chat wrapper.
 
 Authentication, multi-tenancy, GitHub integration, codebase indexing, the
 AI/RAG chat engine, the architecture/dependency explorer, AI pull request
-intelligence, automatic developer onboarding, and engineering analytics are
-complete and tested:
+intelligence, automatic developer onboarding, engineering analytics, and
+real-time infrastructure are complete and tested:
 email/password auth, GitHub OAuth login, organizations with role-based
 authorization (owner/admin/developer/viewer), password reset, email
 verification, a GitHub App connection flow, a repository overview
@@ -38,8 +38,13 @@ progress tracking) — and engineering analytics (repository activity,
 commit frequency, PR throughput and cycle time, open issues, contributor
 activity, and file/architecture-level code hotspots — every metric
 computed from real commit/PR/issue data with no AI involved, charted with
-time-range and contributor filters) — all backed by a real database and
-263 passing backend tests. See
+time-range and contributor filters) — and real-time infrastructure (a
+unified WebSocket event system pushing indexing progress, repository
+sync, webhook processing, and AI generation status straight into the
+frontend's cache with no polling refresh while connected, a reconnecting
+connection with backoff and a live connection-status indicator, and a
+wired-up notification bell) — all backed by a real database and
+270 passing backend tests. See
 [`docs/product/README.md`](docs/product/README.md) for scope,
 [`docs/architecture/0001-foundation.md`](docs/architecture/0001-foundation.md)
 for the initial architecture,
@@ -58,7 +63,9 @@ for PR intelligence, and
 [`docs/architecture/0008-developer-onboarding.md`](docs/architecture/0008-developer-onboarding.md)
 for developer onboarding, and
 [`docs/architecture/0009-engineering-analytics.md`](docs/architecture/0009-engineering-analytics.md)
-for engineering analytics.
+for engineering analytics, and
+[`docs/architecture/0010-realtime-infrastructure.md`](docs/architecture/0010-realtime-infrastructure.md)
+for real-time infrastructure.
 
 ## Stack
 
@@ -69,6 +76,7 @@ for engineering analytics.
 | Database   | PostgreSQL + pgvector                                              |
 | Indexing   | tree-sitter (AST parsing/chunking), Voyage AI (`voyage-code-3`)   |
 | Jobs       | arq + Redis                                                       |
+| Real-time  | WebSockets + Redis pub/sub (one event bus, one channel per organization) |
 | AI         | Anthropic Claude or a free local Ollama model (Qwen/Llama/Gemma) for chat, Voyage AI (embeddings, reranking), LangGraph for retrieval orchestration |
 | Graph viz  | `@xyflow/react` (React Flow) + `@dagrejs/dagre` for layout        |
 | Charting   | `recharts`                                                         |

@@ -27,6 +27,8 @@ from app.domain.onboarding_guide import (
     SetupStepRecord,
 )
 from app.domain.repository import Repository
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
 from app.integrations.github import app_client
 from app.onboarding import prompt as onboarding_prompt
 from app.onboarding.context import OnboardingContext, build_context
@@ -42,6 +44,7 @@ from app.repositories import (
     onboarding_guide_repository,
     onboarding_progress_repository,
 )
+from app.schemas.onboarding import OnboardingGuidePublic
 from app.services.exceptions import OnboardingGuideNotFoundError, RepositoryNotIndexedError
 
 logger = logging.getLogger("repomind.onboarding")
@@ -134,6 +137,30 @@ async def run_generation(guide_id: uuid.UUID, *, ai_provider: AIProvider) -> Non
                 guide, finished_at=datetime.now(UTC), error=str(exc)
             )
             await db.commit()
+            await _publish_failure(db, guide)
+
+
+async def _publish_failure(db: AsyncSession, guide: OnboardingGuide) -> None:
+    """Best-effort — see pr_analysis_service._publish_failure."""
+    try:
+        repository = await db.get(Repository, guide.repository_id)
+        if repository is None:
+            return
+        await publish_state(
+            category=EventCategory.AI_GENERATION,
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            resource="onboarding_guide",
+            data=OnboardingGuidePublic.from_guide(guide).model_dump(mode="json"),
+        )
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"Onboarding guide failed to generate for {repository.full_name}",
+            level="error",
+        )
+    except Exception:  # noqa: BLE001 — see docstring
+        logger.exception("Failed to publish onboarding failure event for %s", guide.id)
 
 
 async def _run_generation_body(
@@ -151,6 +178,13 @@ async def _run_generation_body(
 
     onboarding_guide_repository.mark_running(guide, started_at=datetime.now(UTC))
     await db.commit()
+    await publish_state(
+        category=EventCategory.AI_GENERATION,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="onboarding_guide",
+        data=OnboardingGuidePublic.from_guide(guide).model_dump(mode="json"),
+    )
 
     installation = await github_installation_repository.get_by_id(db, repository.installation_id)
     if installation is None:
@@ -220,6 +254,19 @@ async def _run_generation_body(
         output_tokens=output_tokens,
     )
     await db.commit()
+    await publish_state(
+        category=EventCategory.AI_GENERATION,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="onboarding_guide",
+        data=OnboardingGuidePublic.from_guide(guide).model_dump(mode="json"),
+    )
+    await publish_notification(
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        title=f"Onboarding guide ready for {repository.full_name}",
+        level="success",
+    )
 
 
 async def _complete_guide(

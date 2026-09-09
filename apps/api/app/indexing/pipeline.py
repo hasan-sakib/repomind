@@ -24,6 +24,8 @@ from app.domain.code_file import ImportRecord
 from app.domain.indexing_job import IndexingJob
 from app.domain.indexing_status import IndexingJobStatus, IndexingStage
 from app.domain.repository import Repository
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
 from app.indexing import chunker, discovery
 from app.indexing.parser import parse_source
 from app.integrations.git.fetcher import clone_repository
@@ -35,12 +37,28 @@ from app.repositories import (
     indexing_error_repository,
     indexing_job_repository,
 )
+from app.schemas.indexing import IndexingJobPublic
 
 logger = logging.getLogger("repomind.indexing")
 
 # voyageai.VOYAGE_EMBED_BATCH_SIZE is 128 — batching this many chunks per
 # embed() call keeps requests well inside that limit.
 _EMBEDDING_BATCH_SIZE = 128
+
+
+async def _persist(db: AsyncSession, job: IndexingJob, repository: Repository) -> None:
+    """Commits the job's current progress and pushes the same state onto
+    this repository's real-time channel — one choke point rather than a
+    publish call duplicated at every one of update_progress's call sites.
+    See docs/architecture/0010-realtime-infrastructure.md."""
+    await db.commit()
+    await publish_state(
+        category=EventCategory.INDEXING,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="indexing_job",
+        data=IndexingJobPublic.from_job(job).model_dump(mode="json"),
+    )
 
 
 async def run_indexing_job(
@@ -64,15 +82,15 @@ async def run_indexing_job(
         return
 
     indexing_job_repository.mark_running(job, started_at=datetime.now(UTC))
-    await db.commit()
+    await _persist(db, job, repository)
 
     try:
         had_errors, pending_embeddings = await _discover_and_chunk(db, job, repository, settings)
 
         indexing_job_repository.update_progress(job, current_stage=IndexingStage.EMBEDDING)
-        await db.commit()
+        await _persist(db, job, repository)
         had_embedding_errors = await _generate_embeddings(
-            db, job, pending_embeddings, embedding_provider
+            db, job, repository, pending_embeddings, embedding_provider
         )
 
         final_status = (
@@ -83,14 +101,28 @@ async def run_indexing_job(
         indexing_job_repository.mark_finished(
             job, status=final_status, finished_at=datetime.now(UTC)
         )
-        await db.commit()
+        await _persist(db, job, repository)
+        succeeded = final_status == IndexingJobStatus.SUCCEEDED
+        outcome = "finished" if succeeded else "finished with some errors"
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"Indexing {outcome} for {repository.full_name}",
+            level="success" if succeeded else "error",
+        )
     except Exception as exc:  # noqa: BLE001 — must never crash the worker task silently
         logger.exception("Indexing job %s failed", job.id)
         await db.rollback()
         indexing_job_repository.mark_finished(
             job, status=IndexingJobStatus.FAILED, finished_at=datetime.now(UTC), error=str(exc)
         )
-        await db.commit()
+        await _persist(db, job, repository)
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"Indexing failed for {repository.full_name}",
+            level="error",
+        )
 
 
 async def _discover_and_chunk(
@@ -110,7 +142,7 @@ async def _discover_and_chunk(
     chunks_created = 0
 
     indexing_job_repository.update_progress(job, current_stage=IndexingStage.FETCHING)
-    await db.commit()
+    await _persist(db, job, repository)
 
     async with clone_repository(
         installation_id=repository.installation.github_installation_id,
@@ -118,7 +150,7 @@ async def _discover_and_chunk(
         commit_sha=job.commit_sha,
     ) as repo_root:
         indexing_job_repository.update_progress(job, current_stage=IndexingStage.DISCOVERING)
-        await db.commit()
+        await _persist(db, job, repository)
 
         discovered = discovery.discover_files(
             repo_root,
@@ -128,7 +160,7 @@ async def _discover_and_chunk(
         indexing_job_repository.update_progress(
             job, current_stage=IndexingStage.FILTERING, files_discovered=len(discovered)
         )
-        await db.commit()
+        await _persist(db, job, repository)
 
         for file in discovered:
             kept_paths.append(file.path)
@@ -154,7 +186,7 @@ async def _discover_and_chunk(
                 indexing_job_repository.update_progress(
                     job, current_stage=IndexingStage.FILTERING, files_skipped=files_skipped
                 )
-                await db.commit()
+                await _persist(db, job, repository)
                 continue
 
             try:
@@ -261,7 +293,7 @@ async def _discover_and_chunk(
                 symbols_extracted=symbols_extracted,
                 chunks_created=chunks_created,
             )
-            await db.commit()
+            await _persist(db, job, repository)
 
         await code_file_repository.delete_missing(
             db, repository_id=repository.id, keep_paths=kept_paths
@@ -274,6 +306,7 @@ async def _discover_and_chunk(
 async def _generate_embeddings(
     db: AsyncSession,
     job: IndexingJob,
+    repository: Repository,
     pending_embeddings: list[tuple[uuid.UUID, str]],
     embedding_provider: EmbeddingProvider,
 ) -> bool:
@@ -302,6 +335,6 @@ async def _generate_embeddings(
         indexing_job_repository.update_progress(
             job, current_stage=IndexingStage.EMBEDDING, embeddings_generated=embeddings_generated
         )
-        await db.commit()
+        await _persist(db, job, repository)
 
     return had_errors

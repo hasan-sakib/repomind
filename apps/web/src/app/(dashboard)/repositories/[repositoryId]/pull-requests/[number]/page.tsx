@@ -23,6 +23,7 @@ import {
 } from "@/lib/api/pull-requests";
 import { getRepositoryOverview } from "@/lib/api/repositories";
 import { formatRelativeTime } from "@/lib/format-time";
+import { useRealtime } from "@/lib/realtime-context";
 
 const ACTIVE_STATUSES = new Set(["queued", "running"]);
 
@@ -34,6 +35,7 @@ export default function PullRequestDetailPage({
   const { repositoryId, number: numberParam } = use(params);
   const number = Number(numberParam);
   const queryClient = useQueryClient();
+  const { status: connectionStatus } = useRealtime();
 
   const overviewQuery = useQuery({
     queryKey: ["repository-overview", repositoryId],
@@ -51,8 +53,15 @@ export default function PullRequestDetailPage({
     retry: (failureCount, error) =>
       !(error instanceof ApiError && error.code === "pull_request_analysis_not_found") &&
       failureCount < 2,
+    // The real-time connection already pushes analysis-status updates
+    // straight into this cache — polling is purely a fallback for when
+    // it isn't connected.
     refetchInterval: (query) =>
-      query.state.data && ACTIVE_STATUSES.has(query.state.data.status) ? 2000 : false,
+      connectionStatus !== "open" &&
+      query.state.data &&
+      ACTIVE_STATUSES.has(query.state.data.status)
+        ? 2000
+        : false,
   });
 
   const triggerMutation = useMutation({

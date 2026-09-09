@@ -43,6 +43,7 @@ import {
   triggerOnboardingGuide,
 } from "@/lib/api/onboarding";
 import { getRepositoryOverview } from "@/lib/api/repositories";
+import { useRealtime } from "@/lib/realtime-context";
 
 const SECTIONS = [
   { key: "section:repository-intro", title: "Repository Introduction", icon: BookOpenIcon },
@@ -64,6 +65,7 @@ export default function OnboardingPage({
 }) {
   const { repositoryId } = use(params);
   const queryClient = useQueryClient();
+  const { status: connectionStatus } = useRealtime();
 
   const overviewQuery = useQuery({
     queryKey: ["repository-overview", repositoryId],
@@ -76,8 +78,15 @@ export default function OnboardingPage({
     retry: (failureCount, error) =>
       !(error instanceof ApiError && error.code === "onboarding_guide_not_found") &&
       failureCount < 2,
+    // The real-time connection already pushes guide-status updates
+    // straight into this cache — polling is purely a fallback for when
+    // it isn't connected.
     refetchInterval: (query) =>
-      query.state.data && ACTIVE_STATUSES.has(query.state.data.status) ? 2000 : false,
+      connectionStatus !== "open" &&
+      query.state.data &&
+      ACTIVE_STATUSES.has(query.state.data.status)
+        ? 2000
+        : false,
   });
 
   const progressQuery = useQuery({

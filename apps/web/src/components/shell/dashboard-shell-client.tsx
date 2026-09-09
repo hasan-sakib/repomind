@@ -3,6 +3,7 @@
 import { AppShell } from "@/components/shell/app-shell";
 import { useMeQuery } from "@/hooks/use-me";
 import { CurrentOrgProvider } from "@/lib/current-org";
+import { RealtimeProvider } from "@/lib/realtime-context";
 import type { MeResponse } from "@/lib/types";
 
 export function DashboardShellClient({
@@ -17,7 +18,9 @@ export function DashboardShellClient({
 
   return (
     <CurrentOrgProvider organizations={organizations}>
-      <AppShell>{children}</AppShell>
+      <RealtimeProvider>
+        <AppShell>{children}</AppShell>
+      </RealtimeProvider>
     </CurrentOrgProvider>
   );
 }

@@ -28,6 +28,8 @@ from app.domain.pull_request_analysis import (
     RecommendedTestRecord,
 )
 from app.domain.repository import Repository
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
 from app.integrations.github import app_client, rest_client
 from app.pr_analysis import prompt as pr_prompt
 from app.pr_analysis.context import PRAnalysisContext, build_context
@@ -42,6 +44,7 @@ from app.repositories import (
     pull_request_analysis_repository,
     pull_request_repository,
 )
+from app.schemas.pr_analysis import PullRequestAnalysisPublic
 from app.services.exceptions import PullRequestAnalysisNotFoundError, PullRequestNotFoundError
 
 logger = logging.getLogger("repomind.pr_analysis")
@@ -109,6 +112,36 @@ async def run_analysis(analysis_id: uuid.UUID, *, ai_provider: AIProvider) -> No
                 analysis, finished_at=datetime.now(UTC), error=str(exc)
             )
             await db.commit()
+            await _publish_failure(db, analysis)
+
+
+async def _publish_failure(db: AsyncSession, analysis: PullRequestAnalysis) -> None:
+    """Best-effort: re-resolves the repository this analysis belongs to
+    just for the real-time event — a task that must always reach a
+    terminal state can't let a lookup failure here re-raise."""
+    try:
+        pr = await db.get(PullRequest, analysis.pull_request_id)
+        repository = await db.get(Repository, pr.repository_id) if pr is not None else None
+        if pr is None or repository is None:
+            return
+        await publish_state(
+            category=EventCategory.AI_GENERATION,
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            resource="pull_request_analysis",
+            data={
+                **PullRequestAnalysisPublic.from_analysis(analysis).model_dump(mode="json"),
+                "pull_request_number": pr.number,
+            },
+        )
+        await publish_notification(
+            organization_id=repository.organization_id,
+            repository_id=repository.id,
+            title=f"PR analysis failed for {repository.full_name}#{pr.number}",
+            level="error",
+        )
+    except Exception:  # noqa: BLE001 — see docstring
+        logger.exception("Failed to publish PR analysis failure event for %s", analysis.id)
 
 
 async def _run_analysis_body(
@@ -129,6 +162,16 @@ async def _run_analysis_body(
 
     pull_request_analysis_repository.mark_running(analysis, started_at=datetime.now(UTC))
     await db.commit()
+    await publish_state(
+        category=EventCategory.AI_GENERATION,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="pull_request_analysis",
+        data={
+            **PullRequestAnalysisPublic.from_analysis(analysis).model_dump(mode="json"),
+            "pull_request_number": pr.number,
+        },
+    )
 
     installation = await github_installation_repository.get_by_id(db, repository.installation_id)
     if installation is None:
@@ -183,6 +226,22 @@ async def _run_analysis_body(
         output_tokens=output_tokens,
     )
     await db.commit()
+    await publish_state(
+        category=EventCategory.AI_GENERATION,
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        resource="pull_request_analysis",
+        data={
+            **PullRequestAnalysisPublic.from_analysis(analysis).model_dump(mode="json"),
+            "pull_request_number": pr.number,
+        },
+    )
+    await publish_notification(
+        organization_id=repository.organization_id,
+        repository_id=repository.id,
+        title=f"PR analysis ready for {repository.full_name}#{pr.number}",
+        level="success",
+    )
 
 
 async def _complete_analysis(

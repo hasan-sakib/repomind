@@ -42,6 +42,7 @@ import { getRepositoryOverview } from "@/lib/api/repositories";
 import { mergeDailyActivity } from "@/lib/analytics-merge";
 import { filterByTimeRange, type TimeRange } from "@/lib/analytics-time";
 import { useCurrentOrg } from "@/lib/current-org";
+import { useRealtime } from "@/lib/realtime-context";
 import { formatRelativeTime } from "@/lib/format-time";
 
 const ACTIVE_STATUSES = new Set(["queued", "running"]);
@@ -79,6 +80,7 @@ export default function AnalyticsPage({
   const { currentOrg } = useCurrentOrg();
   const organizationId = currentOrg?.organization.id;
   const queryClient = useQueryClient();
+  const { status: connectionStatus } = useRealtime();
   const [timeRange, setTimeRange] = useState<TimeRange>("30d");
   const [selectedContributor, setSelectedContributor] = useState<string | null>(null);
 
@@ -99,8 +101,15 @@ export default function AnalyticsPage({
     retry: (failureCount, error) =>
       !(error instanceof ApiError && error.code === "analytics_snapshot_not_found") &&
       failureCount < 2,
+    // The real-time connection already pushes generation-status updates
+    // straight into this cache — polling is purely a fallback for when
+    // it isn't connected.
     refetchInterval: (query) =>
-      query.state.data && ACTIVE_STATUSES.has(query.state.data.status) ? 2500 : false,
+      connectionStatus !== "open" &&
+      query.state.data &&
+      ACTIVE_STATUSES.has(query.state.data.status)
+        ? 2500
+        : false,
   });
 
   const triggerMutation = useMutation({
