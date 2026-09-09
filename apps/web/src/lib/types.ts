@@ -267,3 +267,82 @@ export interface ConversationDetail {
   conversation: Conversation;
   messages: ChatMessage[];
 }
+
+export type NodeKind = "route" | "service" | "repository" | "model" | "schema" | "other";
+
+export const NODE_KIND_LABELS: Record<NodeKind, string> = {
+  route: "Route",
+  service: "Service",
+  repository: "Repository",
+  model: "Model",
+  schema: "Schema",
+  other: "Other",
+};
+
+export type GraphNodeType = "package" | "file" | "database";
+
+export interface GraphNode {
+  id: string;
+  node_type: GraphNodeType;
+  label: string;
+  kind: NodeKind | "database";
+  path: string | null;
+  file_id: string | null;
+  language: string | null;
+  file_count: number | null;
+  symbol_count: number | null;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  weight: number;
+}
+
+export interface GraphView {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+}
+
+export interface SymbolSummary {
+  id: string;
+  symbol_type: string;
+  name: string;
+  start_line: number;
+  end_line: number;
+  signature: string | null;
+  docstring: string | null;
+}
+
+export interface DependencyRef {
+  file_id: string;
+  path: string;
+  matched_name: string;
+}
+
+export interface FileDetail {
+  file_id: string;
+  path: string;
+  language: string | null;
+  kind: NodeKind;
+  commit_sha: string;
+  symbols: SymbolSummary[];
+  dependencies: DependencyRef[];
+  dependents: DependencyRef[];
+}
+
+export interface ArchitectureSearchResult {
+  file_id: string;
+  path: string;
+  package: string;
+  matched_symbol_name: string | null;
+}
+
+export interface RecentCommit {
+  sha: string;
+  message: string;
+  author_login: string | null;
+  author_name: string | null;
+  html_url: string;
+  authored_at: string;
+}

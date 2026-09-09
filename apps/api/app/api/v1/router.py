@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1.routes import (
+    architecture,
     auth,
     chat,
     github,
@@ -21,4 +22,5 @@ api_router.include_router(github.callback_router)
 api_router.include_router(repositories.org_router)
 api_router.include_router(repositories.router)
 api_router.include_router(chat.router)
+api_router.include_router(architecture.router)
 api_router.include_router(webhooks.router)

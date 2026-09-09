@@ -116,3 +116,13 @@ class MessageNotFoundError(AppError):
 class RegenerateNotAllowedError(AppError):
     status_code = 409
     code = "regenerate_not_allowed"
+
+
+class ArchitectureFileNotFoundError(AppError):
+    status_code = 404
+    code = "architecture_file_not_found"
+
+
+class ArchitecturePackageNotFoundError(AppError):
+    status_code = 404
+    code = "architecture_package_not_found"

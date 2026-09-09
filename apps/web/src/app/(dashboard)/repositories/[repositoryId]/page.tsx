@@ -11,6 +11,7 @@ import {
   CircleDotIcon,
   DatabaseZapIcon,
   MessageSquareIcon,
+  NetworkIcon,
   RefreshCwIcon,
   StarIcon,
   GitForkIcon,
@@ -120,6 +121,14 @@ export default function RepositoryOverviewPage({
             aria-label="Indexing"
           >
             <DatabaseZapIcon className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            render={<Link href={`/repositories/${repositoryId}/architecture`} />}
+            aria-label="Architecture"
+          >
+            <NetworkIcon className="size-4" />
           </Button>
           <Button
             variant="ghost"

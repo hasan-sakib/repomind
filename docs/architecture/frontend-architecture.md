@@ -315,6 +315,14 @@ Both are heavy, browser-only-relevant dependencies that should never be part
 of the initial page bundle or server-rendered; noting the expectation now so
 it isn't reinvented ad hoc later.
 
+> **Update (Phase 6):** the architecture-visualization feature was built —
+> see `docs/architecture/0006-architecture-dependency-graph.md`. In
+> practice it did not need `next/dynamic`: `@xyflow/react` is imported
+> directly into `"use client"` route-scoped components, and the App
+> Router's per-route chunking already keeps it out of every other page's
+> bundle. `pnpm run build` confirmed both architecture routes compile and
+> prerender without an SSR/window issue.
+
 ## 8. Loading, empty, and error states
 
 These are conventions, not suggestions — every route segment listed in §1

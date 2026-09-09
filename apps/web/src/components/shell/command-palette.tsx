@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { LayoutDashboardIcon, LayoutGridIcon, SettingsIcon, UsersIcon } from "lucide-react";
+import {
+  LayoutDashboardIcon,
+  LayoutGridIcon,
+  NetworkIcon,
+  SettingsIcon,
+  UsersIcon,
+} from "lucide-react";
 
 import {
   Command,
@@ -36,6 +42,10 @@ export function CommandPalette() {
             <CommandItem value="Dashboard" onSelect={() => go("/dashboard")}>
               <LayoutDashboardIcon />
               Go to dashboard
+            </CommandItem>
+            <CommandItem value="Architecture" onSelect={() => go("/architecture")}>
+              <NetworkIcon />
+              Go to architecture
             </CommandItem>
             <CommandItem value="Settings" onSelect={() => go("/settings")}>
               <SettingsIcon />
