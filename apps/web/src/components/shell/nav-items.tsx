@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboardIcon, NetworkIcon, SettingsIcon } from "lucide-react";
+import { LayoutDashboardIcon, NetworkIcon, SettingsIcon, SparklesIcon } from "lucide-react";
 
 import { cn } from "cn";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
   { label: "Architecture", href: "/architecture", icon: NetworkIcon },
+  { label: "Onboarding", href: "/onboarding", icon: SparklesIcon },
   { label: "Settings", href: "/settings", icon: SettingsIcon },
 ];
 

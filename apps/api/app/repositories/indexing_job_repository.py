@@ -9,6 +9,7 @@ from app.domain.indexing_job import IndexingJob
 from app.domain.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
 
 _ACTIVE_STATUSES = (IndexingJobStatus.QUEUED, IndexingJobStatus.RUNNING)
+_SUCCEEDED_STATUSES = (IndexingJobStatus.SUCCEEDED, IndexingJobStatus.PARTIAL)
 
 
 async def get(db: AsyncSession, job_id: uuid.UUID) -> IndexingJob | None:
@@ -28,6 +29,24 @@ async def get_active_for_repository(
             IndexingJob.repository_id == repository_id,
             IndexingJob.status.in_(_ACTIVE_STATUSES),
         )
+    )
+    return result.scalar_one_or_none()
+
+
+async def get_latest_succeeded_for_repository(
+    db: AsyncSession, repository_id: uuid.UUID
+) -> IndexingJob | None:
+    """The onboarding guide's cache key (app/services/onboarding_service.py)
+    — a guide is only stale once a *new* successful index has run, not on
+    every failed/in-progress attempt."""
+    result = await db.execute(
+        select(IndexingJob)
+        .where(
+            IndexingJob.repository_id == repository_id,
+            IndexingJob.status.in_(_SUCCEEDED_STATUSES),
+        )
+        .order_by(IndexingJob.created_at.desc())
+        .limit(1)
     )
     return result.scalar_one_or_none()
 

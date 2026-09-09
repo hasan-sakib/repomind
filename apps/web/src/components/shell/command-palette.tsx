@@ -6,6 +6,7 @@ import {
   LayoutGridIcon,
   NetworkIcon,
   SettingsIcon,
+  SparklesIcon,
   UsersIcon,
 } from "lucide-react";
 
@@ -46,6 +47,10 @@ export function CommandPalette() {
             <CommandItem value="Architecture" onSelect={() => go("/architecture")}>
               <NetworkIcon />
               Go to architecture
+            </CommandItem>
+            <CommandItem value="Onboarding" onSelect={() => go("/onboarding")}>
+              <SparklesIcon />
+              Go to onboarding
             </CommandItem>
             <CommandItem value="Settings" onSelect={() => go("/settings")}>
               <SettingsIcon />

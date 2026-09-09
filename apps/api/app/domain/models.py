@@ -23,6 +23,9 @@ from app.domain.indexing_job import IndexingJob
 from app.domain.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
 from app.domain.issue import Issue
 from app.domain.message import Message
+from app.domain.onboarding_guide import OnboardingGuide
+from app.domain.onboarding_progress import OnboardingProgress
+from app.domain.onboarding_status import OnboardingGuideStatus
 from app.domain.organization import Organization
 from app.domain.organization_member import OrganizationMember
 from app.domain.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
@@ -59,6 +62,9 @@ __all__ = [
     "Message",
     "MessageFeedback",
     "MessageRole",
+    "OnboardingGuide",
+    "OnboardingGuideStatus",
+    "OnboardingProgress",
     "Organization",
     "OrganizationMember",
     "PRAnalysisStatus",

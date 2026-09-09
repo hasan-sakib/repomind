@@ -101,6 +101,9 @@ class Settings(BaseSettings):
     pr_analysis_max_patch_chars_per_file: int = 2_000
     pr_analysis_max_output_tokens: int = 3_000
 
+    # Onboarding guide tunables (app/onboarding/, app/services/onboarding_service.py).
+    onboarding_max_output_tokens: int = 4_000
+
 
 @lru_cache
 def get_settings() -> Settings:

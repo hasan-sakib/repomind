@@ -15,7 +15,7 @@ from app.ai.factory import get_ai_provider, get_embedding_provider
 from app.db.session import async_session_factory
 from app.indexing.pipeline import run_indexing_job
 from app.repositories import indexing_job_repository
-from app.services import pr_analysis_service, sync_service
+from app.services import onboarding_service, pr_analysis_service, sync_service
 
 logger = logging.getLogger("repomind.workers")
 
@@ -47,3 +47,11 @@ async def analyze_pull_request(ctx: dict[str, Any], analysis_id: str) -> None:
     row before enqueueing this task). See
     docs/architecture/0007-ai-pull-request-intelligence.md."""
     await pr_analysis_service.run_analysis(uuid.UUID(analysis_id), ai_provider=get_ai_provider())
+
+
+async def generate_onboarding_guide(ctx: dict[str, Any], guide_id: str) -> None:
+    """Runs an already-created OnboardingGuide (see
+    app.services.onboarding_service.trigger_guide_generation, which
+    creates the row before enqueueing this task). See
+    docs/architecture/0008-developer-onboarding.md."""
+    await onboarding_service.run_generation(uuid.UUID(guide_id), ai_provider=get_ai_provider())

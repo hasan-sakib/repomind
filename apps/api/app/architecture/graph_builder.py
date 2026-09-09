@@ -28,6 +28,7 @@ from app.architecture.classifier import NodeKind, classify_path
 from app.architecture.types import (
     DependencyRef,
     FileDetail,
+    FileRanking,
     GraphEdge,
     GraphNode,
     GraphView,
@@ -354,11 +355,50 @@ async def search_nodes(
     return results[:limit]
 
 
+async def rank_files_by_dependents(
+    db: AsyncSession, repository_id: uuid.UUID, *, limit: int = 10
+) -> list[FileRanking]:
+    """The files with the most fan-in (other files depending on them) —
+    the "important/central file" signal app/onboarding/ uses for
+    "recommended files" and "important modules". Reuses the same
+    file-level import graph as build_module_graph/get_file_detail rather
+    than recomputing it a third way."""
+    files = await _load_files(db, repository_id)
+    symbols = await _load_symbols(db, repository_id)
+    name_index = _build_name_index(files, symbols)
+    raw_edges = _resolve_import_edges(files, name_index)
+
+    symbols_by_file: dict[uuid.UUID, list[CodeSymbol]] = defaultdict(list)
+    for symbol in symbols:
+        symbols_by_file[symbol.file_id].append(symbol)
+
+    dependents_count: dict[uuid.UUID, int] = defaultdict(int)
+    dependent_sources: dict[uuid.UUID, set[uuid.UUID]] = defaultdict(set)
+    for src, dst, _name in raw_edges:
+        if src not in dependent_sources[dst]:
+            dependent_sources[dst].add(src)
+            dependents_count[dst] += 1
+
+    rankings = [
+        FileRanking(
+            file_id=file.id,
+            path=file.path,
+            label=_dominant_label(file.path, symbols_by_file.get(file.id, [])),
+            kind=classify_path(file.path),
+            dependents_count=dependents_count.get(file.id, 0),
+        )
+        for file in files
+    ]
+    rankings.sort(key=lambda r: r.dependents_count, reverse=True)
+    return [r for r in rankings if r.dependents_count > 0][:limit]
+
+
 __all__ = [
     "DATABASE_NODE_ID",
     "NodeKind",
     "build_module_graph",
     "build_package_graph",
     "get_file_detail",
+    "rank_files_by_dependents",
     "search_nodes",
 ]

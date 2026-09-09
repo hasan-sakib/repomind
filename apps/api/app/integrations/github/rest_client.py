@@ -1,3 +1,5 @@
+import base64
+
 import httpx
 
 from app.integrations.github.schemas import (
@@ -135,6 +137,28 @@ async def list_pull_request_files(
             client, f"/repos/{full_name}/pulls/{number}/files", per_page=MAX_PULL_REQUEST_FILES
         )
     return [GitHubPullRequestFile.from_api(f) for f in response.json()]
+
+
+async def get_file_content(
+    installation_token: str, full_name: str, *, path: str, ref: str
+) -> str | None:
+    """One small file's raw text content (dependency manifests, README —
+    app/onboarding/), decoded from GitHub's base64 contents response.
+    Returns None if the file doesn't exist at `ref` (a repo missing a
+    given manifest is an expected, common case, not an error) or isn't a
+    regular file (e.g. `path` resolves to a directory)."""
+    async with httpx.AsyncClient(
+        base_url=API_BASE, headers=_headers(installation_token), timeout=15.0
+    ) as client:
+        response = await client.get(f"/repos/{full_name}/contents/{path}", params={"ref": ref})
+    if response.status_code == 404:
+        return None
+    if response.status_code != 200:
+        raise GitHubAPIError(response.status_code, f"GET contents/{path} failed: {response.text}")
+    body = response.json()
+    if not isinstance(body, dict) or body.get("encoding") != "base64":
+        return None
+    return base64.b64decode(body["content"]).decode("utf-8", errors="replace")
 
 
 async def list_issues(installation_token: str, full_name: str) -> list[GitHubIssue]:

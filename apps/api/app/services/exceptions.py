@@ -136,3 +136,13 @@ class PullRequestNotFoundError(AppError):
 class PullRequestAnalysisNotFoundError(AppError):
     status_code = 404
     code = "pull_request_analysis_not_found"
+
+
+class OnboardingGuideNotFoundError(AppError):
+    status_code = 404
+    code = "onboarding_guide_not_found"
+
+
+class RepositoryNotIndexedError(AppError):
+    status_code = 409
+    code = "repository_not_indexed"

@@ -69,3 +69,16 @@ class SearchResult:
     path: str
     package: str
     matched_symbol_name: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class FileRanking:
+    """A file ranked by how many other files in the repository depend on
+    it (fan-in) — used as the "important/central file" signal for
+    onboarding (app/onboarding/), not for the dependency graph itself."""
+
+    file_id: uuid.UUID
+    path: str
+    label: str
+    kind: NodeKind
+    dependents_count: int

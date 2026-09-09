@@ -16,6 +16,7 @@ import {
   StarIcon,
   GitForkIcon,
   SettingsIcon,
+  SparklesIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -137,6 +138,14 @@ export default function RepositoryOverviewPage({
             aria-label="Pull requests"
           >
             <GitPullRequestIcon className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            render={<Link href={`/repositories/${repositoryId}/onboarding`} />}
+            aria-label="Onboarding"
+          >
+            <SparklesIcon className="size-4" />
           </Button>
           <Button
             variant="ghost"

@@ -404,3 +404,79 @@ export interface PullRequestAnalysis {
   started_at: string | null;
   finished_at: string | null;
 }
+
+export type OnboardingGuideStatus = "queued" | "running" | "succeeded" | "failed";
+
+export const ONBOARDING_GUIDE_STATUS_LABELS: Record<OnboardingGuideStatus, string> = {
+  queued: "Queued",
+  running: "Generating…",
+  succeeded: "Ready",
+  failed: "Failed",
+};
+
+export interface ImportantModule {
+  name: string;
+  path: string;
+  kind: string;
+  file_count: number;
+}
+
+export interface RecommendedFile {
+  path: string;
+  label: string;
+  kind: string;
+  dependents_count: number;
+}
+
+export interface OnboardingDependency {
+  name: string;
+  version: string | null;
+  ecosystem: string;
+}
+
+export interface SetupStep {
+  order: number;
+  description: string;
+  command: string | null;
+  detected_from: string;
+}
+
+export interface DatabaseStructureEntry {
+  path: string;
+  class_name: string;
+  symbol_type: string;
+}
+
+export interface LearningPathStep {
+  step: number;
+  label: string;
+  path: string | null;
+  reason: string;
+}
+
+export interface FaqEntry {
+  question: string;
+  answer: string;
+  file_paths: string[];
+}
+
+export interface OnboardingGuide {
+  id: string;
+  status: OnboardingGuideStatus;
+  commit_sha: string;
+  architecture_overview: string | null;
+  common_workflows: string | null;
+  authentication_flow: string | null;
+  faq: FaqEntry[];
+  important_modules: ImportantModule[];
+  recommended_files: RecommendedFile[];
+  key_dependencies: OnboardingDependency[];
+  dev_setup_steps: SetupStep[];
+  database_structure: DatabaseStructureEntry[];
+  learning_path: LearningPathStep[];
+  model: string | null;
+  error: string | null;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}

@@ -5,6 +5,7 @@ import {
   FlaskConicalIcon,
 } from "lucide-react";
 
+import { FileChip } from "@/components/file-chip";
 import { Badge } from "@/components/ui/badge";
 import { buildBlobUrl } from "@/lib/github-url";
 import type { PullRequestAnalysis, Repository } from "@/lib/types";
@@ -16,31 +17,6 @@ const FILE_STATUS_VARIANT: Record<string, "success" | "warning" | "destructive" 
   removed: "destructive",
   renamed: "warning",
 };
-
-function FileLink({
-  path,
-  repository,
-  headSha,
-  symbolName,
-}: {
-  path: string;
-  repository: Repository;
-  headSha: string;
-  symbolName?: string | null;
-}) {
-  return (
-    <a
-      href={buildBlobUrl(repository, path, { ref: headSha })}
-      target="_blank"
-      rel="noreferrer"
-      className="inline-flex max-w-full items-center gap-1 truncate rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-[11px] text-foreground hover:border-brand hover:text-brand"
-      title={path}
-    >
-      <span className="truncate">{path}</span>
-      {symbolName && <span className="shrink-0 text-muted-foreground">· {symbolName}</span>}
-    </a>
-  );
-}
 
 export function AnalysisPanel({
   analysis,
@@ -85,11 +61,11 @@ export function AnalysisPanel({
                 <p className="text-sm font-medium text-foreground">{component.name}</p>
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {component.file_paths.map((path) => (
-                    <FileLink
+                    <FileChip
                       key={path}
                       path={path}
                       repository={repository}
-                      headSha={analysis.head_sha}
+                      gitRef={analysis.head_sha}
                     />
                   ))}
                 </div>
@@ -108,10 +84,10 @@ export function AnalysisPanel({
                 <p className="text-foreground">{concern.description}</p>
                 {concern.file_path && (
                   <div className="mt-1.5">
-                    <FileLink
+                    <FileChip
                       path={concern.file_path}
                       repository={repository}
-                      headSha={analysis.head_sha}
+                      gitRef={analysis.head_sha}
                       symbolName={concern.symbol_name}
                     />
                   </div>
@@ -135,14 +111,16 @@ export function AnalysisPanel({
                 {test.existing_test_file ? (
                   <div className="mt-1.5 flex items-center gap-1.5">
                     <CheckCircle2Icon className="size-3.5 shrink-0 text-success" />
-                    <FileLink
+                    <FileChip
                       path={test.existing_test_file}
                       repository={repository}
-                      headSha={analysis.head_sha}
+                      gitRef={analysis.head_sha}
                     />
                   </div>
                 ) : (
-                  <p className="mt-1 text-xs text-muted-foreground">No existing test covers this — net-new scenario.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    No existing test covers this — net-new scenario.
+                  </p>
                 )}
               </li>
             ))}
