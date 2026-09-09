@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import {
+  BarChart3Icon,
   LayoutDashboardIcon,
   LayoutGridIcon,
   NetworkIcon,
@@ -51,6 +52,10 @@ export function CommandPalette() {
             <CommandItem value="Onboarding" onSelect={() => go("/onboarding")}>
               <SparklesIcon />
               Go to onboarding
+            </CommandItem>
+            <CommandItem value="Analytics" onSelect={() => go("/analytics")}>
+              <BarChart3Icon />
+              Go to analytics
             </CommandItem>
             <CommandItem value="Settings" onSelect={() => go("/settings")}>
               <SettingsIcon />

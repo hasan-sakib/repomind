@@ -104,6 +104,10 @@ class Settings(BaseSettings):
     # Onboarding guide tunables (app/onboarding/, app/services/onboarding_service.py).
     onboarding_max_output_tokens: int = 4_000
 
+    # Analytics tunables (app/analytics/, app/services/analytics_service.py).
+    analytics_stale_issue_days: int = 30
+    analytics_top_hotspots: int = 15
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -4,6 +4,7 @@ import { use, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  BarChart3Icon,
   ExternalLinkIcon,
   GitBranchIcon,
   GitCommitHorizontalIcon,
@@ -146,6 +147,14 @@ export default function RepositoryOverviewPage({
             aria-label="Onboarding"
           >
             <SparklesIcon className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            render={<Link href={`/repositories/${repositoryId}/analytics`} />}
+            aria-label="Analytics"
+          >
+            <BarChart3Icon className="size-4" />
           </Button>
           <Button
             variant="ghost"

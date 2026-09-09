@@ -79,11 +79,13 @@
   --success-foreground: oklch(0.985 0 0);
   --warning: oklch(0.7 0.16 70);
   --warning-foreground: oklch(0.16 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* Categorical chart series — fixed hue order, validated for adjacent-pair
+     colorblind-safety (see docs/architecture/0009-engineering-analytics.md). */
+  --chart-1: #2a78d6; /* blue */
+  --chart-2: #eb6834; /* orange */
+  --chart-3: #1baf7a; /* aqua */
+  --chart-4: #eda100; /* yellow */
+  --chart-5: #e87ba4; /* magenta */
   --radius: 0.5rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.16 0 0);
@@ -120,11 +122,11 @@
   --success-foreground: oklch(0.16 0 0);
   --warning: oklch(0.75 0.16 75);
   --warning-foreground: oklch(0.16 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --chart-1: #3987e5; /* blue */
+  --chart-2: #d95926; /* orange */
+  --chart-3: #199e70; /* aqua */
+  --chart-4: #c98500; /* yellow */
+  --chart-5: #d55181; /* magenta */
   --sidebar: oklch(0.17 0 0);
   --sidebar-foreground: oklch(0.94 0 0);
   --sidebar-primary: oklch(0.646 0.194 259.2);

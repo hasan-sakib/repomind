@@ -146,3 +146,8 @@ class OnboardingGuideNotFoundError(AppError):
 class RepositoryNotIndexedError(AppError):
     status_code = 409
     code = "repository_not_indexed"
+
+
+class AnalyticsSnapshotNotFoundError(AppError):
+    status_code = 404
+    code = "analytics_snapshot_not_found"

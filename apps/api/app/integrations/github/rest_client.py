@@ -20,6 +20,13 @@ MAX_PULL_REQUESTS = 50
 MAX_ISSUES = 50
 MAX_PULL_REQUEST_FILES = 100
 
+# Deeper (but still bounded) history specifically for analytics — see
+# docs/architecture/0009-engineering-analytics.md. Commit-frequency charts
+# need more than the dashboard's 50-commit window; per-commit file diffs
+# for hotspots are one GitHub API call each, so that sample stays smaller.
+MAX_ANALYTICS_COMMITS = 300
+MAX_HOTSPOT_COMMITS = 100
+
 
 class GitHubAPIError(Exception):
     def __init__(self, status_code: int, message: str) -> None:
@@ -104,6 +111,53 @@ async def list_commits_for_path(
             client, f"/repos/{full_name}/commits", sha=branch, path=file_path, per_page=limit
         )
     return [GitHubCommit.from_api(c) for c in response.json()]
+
+
+async def list_commits_paginated(
+    installation_token: str,
+    full_name: str,
+    *,
+    branch: str,
+    max_commits: int = MAX_ANALYTICS_COMMITS,
+) -> list[GitHubCommit]:
+    """A deeper commit history than `list_commits`, paginated up to
+    `max_commits` — the commit-frequency/contributor-activity charts in
+    app/analytics/ need more than the dashboard's 50-commit window to
+    produce a meaningful trend, but this is still a bounded sample, not
+    full history. See docs/architecture/0009-engineering-analytics.md."""
+    commits: list[GitHubCommit] = []
+    async with httpx.AsyncClient(
+        base_url=API_BASE, headers=_headers(installation_token), timeout=15.0
+    ) as client:
+        page = 1
+        while len(commits) < max_commits:
+            response = await _get(
+                client, f"/repos/{full_name}/commits", sha=branch, per_page=100, page=page
+            )
+            body = response.json()
+            if not body:
+                break
+            commits.extend(GitHubCommit.from_api(c) for c in body)
+            if len(body) < 100:
+                break
+            page += 1
+    return commits[:max_commits]
+
+
+async def get_commit_files(
+    installation_token: str, full_name: str, *, sha: str
+) -> list[GitHubPullRequestFile]:
+    """The file-level diff for a single commit — GitHub's single-commit
+    endpoint returns the same `files` shape as a PR's files endpoint, so
+    this reuses GitHubPullRequestFile rather than a near-duplicate type.
+    Powers file-change-frequency/hotspots (app/analytics/hotspots.py),
+    which Commit rows alone can't answer (ADR 0003's own noted gap)."""
+    async with httpx.AsyncClient(
+        base_url=API_BASE, headers=_headers(installation_token), timeout=15.0
+    ) as client:
+        response = await _get(client, f"/repos/{full_name}/commits/{sha}")
+    body = response.json()
+    return [GitHubPullRequestFile.from_api(f) for f in body.get("files", [])]
 
 
 async def list_pull_requests(installation_token: str, full_name: str) -> list[GitHubPullRequest]:

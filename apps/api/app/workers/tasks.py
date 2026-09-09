@@ -15,7 +15,7 @@ from app.ai.factory import get_ai_provider, get_embedding_provider
 from app.db.session import async_session_factory
 from app.indexing.pipeline import run_indexing_job
 from app.repositories import indexing_job_repository
-from app.services import onboarding_service, pr_analysis_service, sync_service
+from app.services import analytics_service, onboarding_service, pr_analysis_service, sync_service
 
 logger = logging.getLogger("repomind.workers")
 
@@ -55,3 +55,11 @@ async def generate_onboarding_guide(ctx: dict[str, Any], guide_id: str) -> None:
     creates the row before enqueueing this task). See
     docs/architecture/0008-developer-onboarding.md."""
     await onboarding_service.run_generation(uuid.UUID(guide_id), ai_provider=get_ai_provider())
+
+
+async def generate_analytics_snapshot(ctx: dict[str, Any], snapshot_id: str) -> None:
+    """Runs an already-created AnalyticsSnapshot (see
+    app.services.analytics_service.trigger_snapshot_generation, which
+    creates the row before enqueueing this task). No LLM involved — see
+    docs/architecture/0009-engineering-analytics.md."""
+    await analytics_service.run_generation(uuid.UUID(snapshot_id))

@@ -480,3 +480,85 @@ export interface OnboardingGuide {
   started_at: string | null;
   finished_at: string | null;
 }
+
+export type AnalyticsSnapshotStatus = "queued" | "running" | "succeeded" | "failed";
+
+export const ANALYTICS_SNAPSHOT_STATUS_LABELS: Record<AnalyticsSnapshotStatus, string> = {
+  queued: "Queued",
+  running: "Generating…",
+  succeeded: "Ready",
+  failed: "Failed",
+};
+
+export interface DailyCommit {
+  date: string;
+  login: string | null;
+  name: string | null;
+  count: number;
+}
+
+export interface DailyPRIssueActivity {
+  date: string;
+  prs_opened: number;
+  prs_merged: number;
+  prs_closed: number;
+  issues_opened: number;
+}
+
+export interface ContributorActivity {
+  login: string | null;
+  name: string | null;
+  commit_count: number;
+  pr_count: number;
+}
+
+export interface PRCycleTimeSample {
+  number: number;
+  title: string;
+  html_url: string;
+  hours: number;
+  merged_at: string | null;
+}
+
+export interface StaleIssue {
+  number: number;
+  title: string;
+  html_url: string;
+  age_days: number;
+}
+
+export interface FileHotspot {
+  path: string;
+  kind: string;
+  change_count: number;
+  dependents_count: number;
+}
+
+export interface ArchitectureHotspot {
+  package_path: string;
+  kind: string;
+  change_count: number;
+  file_count: number;
+}
+
+export interface AnalyticsSnapshot {
+  id: string;
+  status: AnalyticsSnapshotStatus;
+  synced_through: string | null;
+  daily_commit_activity: DailyCommit[];
+  daily_pr_issue_activity: DailyPRIssueActivity[];
+  contributor_activity: ContributorActivity[];
+  median_cycle_time_hours: number | null;
+  pr_cycle_time_samples: PRCycleTimeSample[];
+  open_issues_total: number;
+  stale_issues: StaleIssue[];
+  file_hotspots: FileHotspot[];
+  architecture_hotspots: ArchitectureHotspot[];
+  commit_sample_size: number;
+  hotspot_commit_sample_size: number;
+  pr_sample_size: number;
+  error: string | null;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
+}

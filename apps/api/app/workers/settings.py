@@ -7,6 +7,7 @@ from app.core.logging import configure_logging
 from app.domain import models  # noqa: F401 — registers every mapped class before first use.
 from app.workers.tasks import (
     analyze_pull_request,
+    generate_analytics_snapshot,
     generate_onboarding_guide,
     index_repository,
     sync_repository,
@@ -16,7 +17,13 @@ settings = get_settings()
 
 
 class WorkerSettings:
-    functions = [index_repository, sync_repository, analyze_pull_request, generate_onboarding_guide]
+    functions = [
+        index_repository,
+        sync_repository,
+        analyze_pull_request,
+        generate_onboarding_guide,
+        generate_analytics_snapshot,
+    ]
     redis_settings = RedisSettings.from_dsn(settings.redis_url)
     # A full clone + parse + chunk + embed run over indexing_max_files_per_repository
     # files comfortably needs more than arq's 300s default.

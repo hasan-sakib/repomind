@@ -2,6 +2,8 @@
 and so string-based relationship() references between modules resolve."""
 
 from app.domain.ai_run import AiRun
+from app.domain.analytics_snapshot import AnalyticsSnapshot
+from app.domain.analytics_status import AnalyticsSnapshotStatus
 from app.domain.audit_log import AuditLog
 from app.domain.branch import Branch
 from app.domain.chat_status import (
@@ -44,6 +46,8 @@ from app.domain.webhook_event import WebhookEvent
 __all__ = [
     "AiRun",
     "AiRunStatus",
+    "AnalyticsSnapshot",
+    "AnalyticsSnapshotStatus",
     "AuditLog",
     "Branch",
     "CodeChunk",

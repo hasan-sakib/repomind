@@ -8,7 +8,8 @@ insight grounded in the actual code — not a generic AI chat wrapper.
 
 Authentication, multi-tenancy, GitHub integration, codebase indexing, the
 AI/RAG chat engine, the architecture/dependency explorer, AI pull request
-intelligence, and automatic developer onboarding are complete and tested:
+intelligence, automatic developer onboarding, and engineering analytics are
+complete and tested:
 email/password auth, GitHub OAuth login, organizations with role-based
 authorization (owner/admin/developer/viewer), password reset, email
 verification, a GitHub App connection flow, a repository overview
@@ -29,12 +30,16 @@ panel with symbols/dependencies/dependents/recent commits, and
 progressive package → module expansion) — AI pull request intelligence
 (risk-level analysis grounded in real changed files/symbols/dependents/
 existing tests, cached per commit, with a structured PR risk report UI)
-— and automatic developer onboarding (a generated guide — architecture
+— automatic developer onboarding (a generated guide — architecture
 overview, important modules, a learning path, dev setup, database
 structure, and FAQ — mostly deterministic from indexed data, with AI
 reserved for the parts that genuinely need synthesis, plus per-developer
-progress tracking) — all backed by a real database and 223 passing
-backend tests. See
+progress tracking) — and engineering analytics (repository activity,
+commit frequency, PR throughput and cycle time, open issues, contributor
+activity, and file/architecture-level code hotspots — every metric
+computed from real commit/PR/issue data with no AI involved, charted with
+time-range and contributor filters) — all backed by a real database and
+263 passing backend tests. See
 [`docs/product/README.md`](docs/product/README.md) for scope,
 [`docs/architecture/0001-foundation.md`](docs/architecture/0001-foundation.md)
 for the initial architecture,
@@ -51,7 +56,9 @@ for the architecture explorer,
 [`docs/architecture/0007-ai-pull-request-intelligence.md`](docs/architecture/0007-ai-pull-request-intelligence.md)
 for PR intelligence, and
 [`docs/architecture/0008-developer-onboarding.md`](docs/architecture/0008-developer-onboarding.md)
-for developer onboarding.
+for developer onboarding, and
+[`docs/architecture/0009-engineering-analytics.md`](docs/architecture/0009-engineering-analytics.md)
+for engineering analytics.
 
 ## Stack
 
@@ -64,6 +71,7 @@ for developer onboarding.
 | Jobs       | arq + Redis                                                       |
 | AI         | Anthropic Claude or a free local Ollama model (Qwen/Llama/Gemma) for chat, Voyage AI (embeddings, reranking), LangGraph for retrieval orchestration |
 | Graph viz  | `@xyflow/react` (React Flow) + `@dagrejs/dagre` for layout        |
+| Charting   | `recharts`                                                         |
 | Deployment | Vercel (web), Railway/Fly.io (API + database)                     |
 
 ## Repository layout

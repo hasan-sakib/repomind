@@ -66,7 +66,7 @@ _STOPWORDS = {
 }
 
 
-def _package_of(path: str) -> str:
+def package_of(path: str) -> str:
     return str(Path(path).parent) if "/" in path else ""
 
 
@@ -141,7 +141,7 @@ async def build_package_graph(db: AsyncSession, repository_id: uuid.UUID) -> Gra
     name_index = _build_name_index(files, symbols)
     raw_edges = _resolve_import_edges(files, name_index)
 
-    package_of_file = {file.id: _package_of(file.path) for file in files}
+    package_of_file = {file.id: package_of(file.path) for file in files}
     files_by_package: dict[str, list[CodeFile]] = defaultdict(list)
     for file in files:
         files_by_package[package_of_file[file.id]].append(file)
@@ -190,7 +190,7 @@ async def build_module_graph(db: AsyncSession, repository_id: uuid.UUID, package
     name_index = _build_name_index(files, symbols)
     raw_edges = _resolve_import_edges(files, name_index)
 
-    package_of_file = {file.id: _package_of(file.path) for file in files}
+    package_of_file = {file.id: package_of(file.path) for file in files}
     symbols_by_file: dict[uuid.UUID, list[CodeSymbol]] = defaultdict(list)
     for symbol in symbols:
         symbols_by_file[symbol.file_id].append(symbol)
@@ -322,7 +322,7 @@ async def search_nodes(
 
     results = [
         SearchResult(
-            file_id=f.id, path=f.path, package=_package_of(f.path), matched_symbol_name=None
+            file_id=f.id, path=f.path, package=package_of(f.path), matched_symbol_name=None
         )
         for f in matched_files
     ]
@@ -345,7 +345,7 @@ async def search_nodes(
                 SearchResult(
                     file_id=symbol.file_id,
                     path=path,
-                    package=_package_of(path),
+                    package=package_of(path),
                     matched_symbol_name=symbol.name,
                 )
             )
@@ -399,6 +399,7 @@ __all__ = [
     "build_module_graph",
     "build_package_graph",
     "get_file_detail",
+    "package_of",
     "rank_files_by_dependents",
     "search_nodes",
 ]
