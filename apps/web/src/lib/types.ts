@@ -112,6 +112,7 @@ export interface PullRequest {
   state: string;
   author_login: string | null;
   html_url: string;
+  head_sha: string;
   github_created_at: string;
   github_updated_at: string;
   closed_at: string | null;
@@ -345,4 +346,61 @@ export interface RecentCommit {
   author_name: string | null;
   html_url: string;
   authored_at: string;
+}
+
+export type PRAnalysisStatus = "queued" | "running" | "succeeded" | "failed";
+
+export const PR_ANALYSIS_STATUS_LABELS: Record<PRAnalysisStatus, string> = {
+  queued: "Queued",
+  running: "Analyzing…",
+  succeeded: "Analyzed",
+  failed: "Failed",
+};
+
+export type PRRiskLevel = "low" | "medium" | "high";
+
+export const PR_RISK_LEVEL_LABELS: Record<PRRiskLevel, string> = {
+  low: "Low risk",
+  medium: "Medium risk",
+  high: "High risk",
+};
+
+export interface AffectedComponent {
+  name: string;
+  file_paths: string[];
+}
+
+export interface PotentialConcern {
+  description: string;
+  file_path: string | null;
+  symbol_name: string | null;
+}
+
+export interface RecommendedTest {
+  description: string;
+  existing_test_file: string | null;
+}
+
+export interface ChangedFile {
+  path: string;
+  status: string;
+  additions: number;
+  deletions: number;
+}
+
+export interface PullRequestAnalysis {
+  id: string;
+  status: PRAnalysisStatus;
+  head_sha: string;
+  risk_level: PRRiskLevel | null;
+  summary: string | null;
+  affected_components: AffectedComponent[];
+  potential_concerns: PotentialConcern[];
+  recommended_tests: RecommendedTest[];
+  files_analyzed: ChangedFile[];
+  model: string | null;
+  error: string | null;
+  created_at: string;
+  started_at: string | null;
+  finished_at: string | null;
 }

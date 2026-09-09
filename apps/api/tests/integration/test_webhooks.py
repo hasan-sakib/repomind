@@ -101,6 +101,7 @@ async def test_webhook_pull_request_creates_and_updates(
             "state": "open",
             "user": {"login": "ada"},
             "html_url": "https://github.com/acme/widgets/pull/7",
+            "head": {"sha": "f" * 40},
             "created_at": "2026-01-01T00:00:00Z",
             "updated_at": "2026-01-01T00:00:00Z",
             "closed_at": None,

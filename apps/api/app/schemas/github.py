@@ -103,6 +103,7 @@ class PullRequestPublic(BaseModel):
     state: str
     author_login: str | None
     html_url: str
+    head_sha: str
     github_created_at: datetime
     github_updated_at: datetime
     closed_at: datetime | None

@@ -5,6 +5,7 @@ from app.integrations.github.schemas import (
     GitHubCommit,
     GitHubIssue,
     GitHubPullRequest,
+    GitHubPullRequestFile,
     GitHubRepo,
 )
 
@@ -15,6 +16,7 @@ API_BASE = "https://api.github.com"
 MAX_COMMITS = 50
 MAX_PULL_REQUESTS = 50
 MAX_ISSUES = 50
+MAX_PULL_REQUEST_FILES = 100
 
 
 class GitHubAPIError(Exception):
@@ -115,6 +117,24 @@ async def list_pull_requests(installation_token: str, full_name: str) -> list[Gi
             per_page=MAX_PULL_REQUESTS,
         )
     return [GitHubPullRequest.from_api(p) for p in response.json()]
+
+
+async def list_pull_request_files(
+    installation_token: str, full_name: str, *, number: int
+) -> list[GitHubPullRequestFile]:
+    """The PR's actual diff — one entry per changed file, with the unified
+    patch text where GitHub provides one. Bounded to
+    MAX_PULL_REQUEST_FILES (GitHub itself caps this endpoint at 3000 files
+    and paginates at 30/page by default); a PR touching more files than
+    that gets analyzed on its first MAX_PULL_REQUEST_FILES only — see
+    docs/architecture/0007-ai-pull-request-intelligence.md."""
+    async with httpx.AsyncClient(
+        base_url=API_BASE, headers=_headers(installation_token), timeout=15.0
+    ) as client:
+        response = await _get(
+            client, f"/repos/{full_name}/pulls/{number}/files", per_page=MAX_PULL_REQUEST_FILES
+        )
+    return [GitHubPullRequestFile.from_api(f) for f in response.json()]
 
 
 async def list_issues(installation_token: str, full_name: str) -> list[GitHubIssue]:

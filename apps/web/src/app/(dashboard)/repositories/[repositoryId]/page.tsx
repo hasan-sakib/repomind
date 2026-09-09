@@ -133,6 +133,14 @@ export default function RepositoryOverviewPage({
           <Button
             variant="ghost"
             size="icon-sm"
+            render={<Link href={`/repositories/${repositoryId}/pull-requests`} />}
+            aria-label="Pull requests"
+          >
+            <GitPullRequestIcon className="size-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
             render={<Link href={`/repositories/${repositoryId}/settings`} />}
             aria-label="Repository settings"
           >
@@ -208,14 +216,12 @@ export default function RepositoryOverviewPage({
         >
           {open_pull_requests.map((pr) => (
             <li key={pr.number} className="px-3 py-2 text-sm">
-              <a
-                href={pr.html_url}
-                target="_blank"
-                rel="noreferrer"
+              <Link
+                href={`/repositories/${repositoryId}/pull-requests/${pr.number}`}
                 className="line-clamp-1 font-medium text-foreground hover:text-brand hover:underline"
               >
                 #{pr.number} {pr.title}
-              </a>
+              </Link>
               <p className="mt-0.5 text-xs text-muted-foreground">
                 {pr.author_login ?? "unknown"} · {formatRelativeTime(pr.github_updated_at)}
               </p>

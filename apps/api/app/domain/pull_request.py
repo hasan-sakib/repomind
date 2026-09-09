@@ -27,6 +27,10 @@ class PullRequest(UUIDPrimaryKeyMixin, Base):
     state: Mapped[str] = mapped_column(String(20), nullable=False)  # open|closed
     author_login: Mapped[str | None] = mapped_column(String(200), nullable=True)
     html_url: Mapped[str] = mapped_column(String(500), nullable=False)
+    # The PR's current head commit — the cache key for PullRequestAnalysis
+    # (app/domain/pull_request_analysis.py): a new commit pushed to the PR
+    # moves this, invalidating any cached analysis at the old sha.
+    head_sha: Mapped[str] = mapped_column(String(40), nullable=False, server_default="")
     github_created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     github_updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

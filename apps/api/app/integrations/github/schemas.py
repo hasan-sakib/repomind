@@ -72,6 +72,7 @@ class GitHubPullRequest:
     state: str
     author_login: str | None
     html_url: str
+    head_sha: str
     created_at: datetime
     updated_at: datetime
     closed_at: datetime | None
@@ -86,10 +87,37 @@ class GitHubPullRequest:
             state=data["state"],
             author_login=user.get("login"),
             html_url=data["html_url"],
+            head_sha=data["head"]["sha"],
             created_at=_parse_datetime(data["created_at"]),
             updated_at=_parse_datetime(data["updated_at"]),
             closed_at=_parse_datetime(data["closed_at"]) if data.get("closed_at") else None,
             merged_at=_parse_datetime(data["merged_at"]) if data.get("merged_at") else None,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class GitHubPullRequestFile:
+    """One entry from `GET /pulls/{number}/files` — the actual diff. `patch`
+    is the unified-diff hunk text; GitHub omits it for binary files and for
+    files past an internal size cutoff, so it's optional even when the
+    file itself is a genuine part of the PR."""
+
+    filename: str
+    status: str  # added | removed | modified | renamed | copied | changed | unchanged
+    additions: int
+    deletions: int
+    changes: int
+    patch: str | None
+
+    @classmethod
+    def from_api(cls, data: dict[str, Any]) -> "GitHubPullRequestFile":
+        return cls(
+            filename=data["filename"],
+            status=data["status"],
+            additions=data.get("additions", 0),
+            deletions=data.get("deletions", 0),
+            changes=data.get("changes", 0),
+            patch=data.get("patch"),
         )
 
 

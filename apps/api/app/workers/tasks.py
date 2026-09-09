@@ -11,11 +11,11 @@ import logging
 import uuid
 from typing import Any
 
-from app.ai.factory import get_embedding_provider
+from app.ai.factory import get_ai_provider, get_embedding_provider
 from app.db.session import async_session_factory
 from app.indexing.pipeline import run_indexing_job
 from app.repositories import indexing_job_repository
-from app.services import sync_service
+from app.services import pr_analysis_service, sync_service
 
 logger = logging.getLogger("repomind.workers")
 
@@ -39,3 +39,11 @@ async def sync_repository(ctx: dict[str, Any], repository_id: str) -> None:
     indexing; see docs/architecture/0003-github-integration.md and
     docs/architecture/0004-codebase-indexing.md."""
     await sync_service.run_sync_in_background(uuid.UUID(repository_id))
+
+
+async def analyze_pull_request(ctx: dict[str, Any], analysis_id: str) -> None:
+    """Runs an already-created PullRequestAnalysis (see
+    app.services.pr_analysis_service.trigger_analysis, which creates the
+    row before enqueueing this task). See
+    docs/architecture/0007-ai-pull-request-intelligence.md."""
+    await pr_analysis_service.run_analysis(uuid.UUID(analysis_id), ai_provider=get_ai_provider())

@@ -7,6 +7,7 @@ from app.api.v1.routes import (
     github,
     health,
     organizations,
+    pull_requests,
     repositories,
     users,
     webhooks,
@@ -23,4 +24,5 @@ api_router.include_router(repositories.org_router)
 api_router.include_router(repositories.router)
 api_router.include_router(chat.router)
 api_router.include_router(architecture.router)
+api_router.include_router(pull_requests.router)
 api_router.include_router(webhooks.router)

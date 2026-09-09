@@ -25,7 +25,9 @@ from app.domain.issue import Issue
 from app.domain.message import Message
 from app.domain.organization import Organization
 from app.domain.organization_member import OrganizationMember
+from app.domain.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
 from app.domain.pull_request import PullRequest
+from app.domain.pull_request_analysis import PullRequestAnalysis
 from app.domain.refresh_token import RefreshToken
 from app.domain.repository import Repository
 from app.domain.repository_membership import RepositoryMembership
@@ -59,7 +61,10 @@ __all__ = [
     "MessageRole",
     "Organization",
     "OrganizationMember",
+    "PRAnalysisStatus",
+    "PRRiskLevel",
     "PullRequest",
+    "PullRequestAnalysis",
     "QueryIntent",
     "RefreshToken",
     "Repository",

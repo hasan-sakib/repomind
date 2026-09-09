@@ -36,6 +36,7 @@ def create(
     state: str,
     author_login: str | None,
     html_url: str,
+    head_sha: str,
     github_created_at: datetime,
     github_updated_at: datetime,
     closed_at: datetime | None,
@@ -49,6 +50,7 @@ def create(
         state=state,
         author_login=author_login,
         html_url=html_url,
+        head_sha=head_sha,
         github_created_at=github_created_at,
         github_updated_at=github_updated_at,
         closed_at=closed_at,
@@ -64,6 +66,7 @@ def update(
     *,
     title: str,
     state: str,
+    head_sha: str,
     github_updated_at: datetime,
     closed_at: datetime | None,
     merged_at: datetime | None,
@@ -71,6 +74,7 @@ def update(
 ) -> None:
     pr.title = title
     pr.state = state
+    pr.head_sha = head_sha
     pr.github_updated_at = github_updated_at
     pr.closed_at = closed_at
     pr.merged_at = merged_at

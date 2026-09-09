@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "cn";
+import { buildBlobUrl } from "@/lib/github-url";
 import type { Repository, SourceReference } from "@/lib/types";
 
 const SOURCE_TYPE_ICON = {
@@ -26,13 +27,10 @@ const SOURCE_TYPE_LABEL = {
 function sourceHref(source: SourceReference, repository: Repository): string | null {
   if (source.source_type === "git_history") return source.commit_url;
   if (!source.file_path) return null;
-  const lines =
-    source.start_line == null
-      ? ""
-      : source.start_line === source.end_line
-        ? `#L${source.start_line}`
-        : `#L${source.start_line}-L${source.end_line}`;
-  return `${repository.html_url}/blob/${repository.default_branch}/${source.file_path}${lines}`;
+  return buildBlobUrl(repository, source.file_path, {
+    startLine: source.start_line,
+    endLine: source.end_line,
+  });
 }
 
 export function SourcePanel({

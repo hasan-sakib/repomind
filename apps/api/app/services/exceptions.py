@@ -126,3 +126,13 @@ class ArchitectureFileNotFoundError(AppError):
 class ArchitecturePackageNotFoundError(AppError):
     status_code = 404
     code = "architecture_package_not_found"
+
+
+class PullRequestNotFoundError(AppError):
+    status_code = 404
+    code = "pull_request_not_found"
+
+
+class PullRequestAnalysisNotFoundError(AppError):
+    status_code = 404
+    code = "pull_request_analysis_not_found"

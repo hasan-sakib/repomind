@@ -97,6 +97,10 @@ class Settings(BaseSettings):
     rag_git_history_limit: int = 5
     rag_max_context_chars: int = 24_000
 
+    # PR analysis tunables (app/pr_analysis/, app/services/pr_analysis_service.py).
+    pr_analysis_max_patch_chars_per_file: int = 2_000
+    pr_analysis_max_output_tokens: int = 3_000
+
 
 @lru_cache
 def get_settings() -> Settings:

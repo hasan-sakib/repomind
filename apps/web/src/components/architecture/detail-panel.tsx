@@ -12,12 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getFileDetail, getRecentChanges } from "@/lib/api/architecture";
 import { formatRelativeTime } from "@/lib/format-time";
+import { buildBlobUrl } from "@/lib/github-url";
 import { NODE_KIND_LABELS, type GraphNode, type NodeKind, type Repository } from "@/lib/types";
 import { KIND_ICON } from "./node-kind-icon";
-
-function blobUrl(repository: Repository, path: string): string {
-  return `${repository.html_url}/blob/${repository.default_branch}/${path}`;
-}
 
 function DependencyList({
   title,
@@ -43,7 +40,7 @@ function DependencyList({
         {items.map((item) => (
           <li key={item.file_id}>
             <a
-              href={blobUrl(repository, item.path)}
+              href={buildBlobUrl(repository, item.path)}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 truncate font-mono text-xs text-muted-foreground hover:text-brand hover:underline"
@@ -147,7 +144,7 @@ export function DetailPanel({
           </span>
           {node.path && (
             <a
-              href={blobUrl(repository, node.path)}
+              href={buildBlobUrl(repository, node.path)}
               target="_blank"
               rel="noreferrer"
               className="ml-auto text-muted-foreground hover:text-foreground"
@@ -189,7 +186,10 @@ export function DetailPanel({
                 {fileDetailQuery.data.symbols.map((symbol) => (
                   <li key={symbol.id} className="text-xs">
                     <a
-                      href={`${blobUrl(repository, node.path!)}#L${symbol.start_line}-L${symbol.end_line}`}
+                      href={buildBlobUrl(repository, node.path!, {
+                        startLine: symbol.start_line,
+                        endLine: symbol.end_line,
+                      })}
                       target="_blank"
                       rel="noreferrer"
                       className="font-mono text-foreground hover:text-brand hover:underline"
