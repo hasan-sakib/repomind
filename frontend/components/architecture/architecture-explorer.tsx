@@ -256,8 +256,8 @@ export function ArchitectureExplorer({ repositoryId }: { repositoryId: string })
         })}
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1fr_18rem]">
-        <div className="min-h-0" onClick={() => setSearchOpen(false)}>
+      <div className="grid min-h-0 flex-1 grid-rows-[minmax(0,1fr)] grid-cols-1 md:grid-cols-[1fr_18rem]">
+        <div className="h-full min-h-0" onClick={() => setSearchOpen(false)}>
           <DependencyGraph
             nodes={filteredNodes}
             edges={filteredEdges}
@@ -266,7 +266,7 @@ export function ArchitectureExplorer({ repositoryId }: { repositoryId: string })
             onNodeDoubleClick={handleNodeDoubleClick}
           />
         </div>
-        <div className="hidden min-h-0 overflow-y-auto border-l border-border md:block">
+        <div className="hidden h-full min-h-0 overflow-y-auto border-l border-border md:block">
           <DetailPanel
             node={selectedNode}
             repositoryId={repositoryId}
