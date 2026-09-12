@@ -49,6 +49,11 @@ services:
       DATABASE_URL: postgresql+asyncpg://repomind:repomind@postgres:5432/repomind
       REDIS_URL: redis://redis:6379
       FRONTEND_URL: http://localhost:3000
+      # backend/.env's OLLAMA_HOST=http://localhost:11434 means "this
+      # container itself" from in here, not the Mac host running `ollama
+      # serve` — host.docker.internal is Docker Desktop's DNS name for the
+      # host machine.
+      OLLAMA_HOST: http://host.docker.internal:11434
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     ports:
       - "8000:8000"
@@ -67,6 +72,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://repomind:repomind@postgres:5432/repomind
       REDIS_URL: redis://redis:6379
+      OLLAMA_HOST: http://host.docker.internal:11434
     command: arq app.workers.settings.WorkerSettings
     depends_on:
       postgres:
