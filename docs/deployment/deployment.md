@@ -19,6 +19,19 @@ up — see §3). This document supersedes the previous stub at this path.
 > is provisioned yet, so this is a correction to apply when it is, not a
 > description of something already deployed differently.
 
+> **Superseded (Phase 15):** the API/database host below is Fly.io — the
+> Phase 1 placeholder choice. The finalized plan is
+> **`docs/deployment/ci-cd.md`**: Vercel (frontend, unchanged), **Render
+> or Railway** (API + worker, running the same `backend/Dockerfile` this
+> doc's Fly plan already assumed), **Supabase** (Postgres, in place of
+> Fly-managed Postgres), and **Upstash** (Redis — this doc's own §8
+> secrets table already anticipated Upstash for `REDIS_URL`, so that part
+> didn't actually change). §§1–2 and §4–6, §9 below describe the
+> superseded Fly-specific plan; §3 (CORS/cookie same-site domain
+> constraint), §7 (migration safety rules), §8's *shape* (what secrets
+> exist, just not *where* — see ci-cd.md for the current answer), and §10
+> (observability) are provider-agnostic and still apply as written.
+
 ## 1. Topology
 
 ```mermaid
@@ -269,21 +282,15 @@ behavior, any size limit) is not independently verified here.
 
 ## 9. CI/CD
 
-`.github/workflows/ci.yml` stays exactly as it is — it already runs
-lint/typecheck/build for `frontend` and lint/typecheck/test for `backend`
-against a Postgres service container, on every push to `main` and every PR.
-Nothing in this document changes it.
-
-**Planned, not yet created** (out of scope for this doc-only phase — no
-`deploy.yml` exists yet): a GitHub Actions workflow that runs `fly deploy`
-against `repomind-api` on merge to `main`, after CI passes. Web deploys are
-not part of this workflow at all — Vercel's own GitHub integration deploys
-independently of GitHub Actions (both preview and production), so `deploy.yml`
-only needs to own the Fly side. Sketch of what that workflow will need, for
-when it's actually written: `flyctl deploy` authenticated via a
-`FLY_API_TOKEN` GitHub Actions secret, gated on the `ci.yml` `api` job (and
-probably `web`, since a broken frontend build shouldn't block an API deploy
-but a broken API shouldn't ship either) passing first.
+**Superseded by `docs/deployment/ci-cd.md`.** The single `ci.yml` this
+section described no longer exists — it was split into
+`.github/workflows/frontend-ci.yml`, `backend-ci.yml`, and `security.yml`
+(Phase 15), each path-scoped to the part of the monorepo it covers. The
+`flyctl deploy`-based `deploy.yml` sketched below was never built, and
+per ci-cd.md's "Deliberately no `deploy.yml`" section, it now never will
+be under the Render/Railway plan either — both platforms (like Vercel)
+deploy directly from a git push via their own integration, the same way
+Fly's own GitHub integration could have but this sketch didn't assume.
 
 ## 10. Observability at MVP scale
 

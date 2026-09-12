@@ -1,0 +1,124 @@
+name: Security
+
+# Deliberately not scoped to path filters like the two CI workflows — a
+# dependency can grow a new CVE, or a secret can get committed, on a PR
+# that touches neither `frontend/` nor `backend/` source, and severities
+# change over time independent of any code change at all (the weekly
+# schedule below exists for exactly that reason).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Mondays 06:00 UTC — catches newly-disclosed CVEs in dependencies that
+    # haven't changed, which push/pull_request alone would never re-check.
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit-frontend:
+    name: Dependency audit (frontend)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+      # --audit-level=high: fails on high/critical advisories only — a low
+      # or moderate advisory in a transitive dependency with no available
+      # fix yet shouldn't block every PR. Raise or lower this threshold as
+      # the project's risk tolerance changes.
+      - name: pnpm audit
+        run: pnpm audit --audit-level=high
+
+  dependency-audit-backend:
+    name: Dependency audit (backend)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.10.7"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+      - name: Install dependencies
+        run: uv sync
+      # pip-audit checks the synced venv's installed packages (via `uv
+      # run`, so it sees exactly what's actually installed) against the
+      # PyPA/OSV advisory database.
+      - name: pip-audit
+        run: uv run --with pip-audit pip-audit
+
+  secret-scan:
+    name: Secret detection (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, not just the current commit — gitleaks scans git
+          # log by default, which is the point: a secret committed and
+          # later deleted is still a leaked secret. See
+          # docs/architecture/security.md's own git-history check, which
+          # this automates.
+          fetch-depth: 0
+      # Runs the official image directly rather than a marketplace
+      # wrapper action, so this doesn't depend on any third-party action's
+      # own licensing terms — gitleaks itself is fully open-source.
+      # --config points at .gitleaksignore-equivalent allowlist entries
+      # for the fixed, clearly-fake test/CI secrets — see that file.
+      - name: Run gitleaks
+        run: |
+          docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest \
+            detect --source=/repo --config=/repo/.gitleaks.toml --redact -v --exit-code=1
+
+  vulnerability-scan:
+    name: Vulnerability scan (Trivy)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # Required to upload SARIF results to the repo's Security tab.
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      # Filesystem scan: known CVEs in both ecosystems' lockfiles (a second
+      # opinion alongside pnpm audit/pip-audit, from a different advisory
+      # database) plus Dockerfile/IaC misconfigurations (e.g. a container
+      # that would run as root). Non-blocking by design — see the report
+      # step below — findings land in the Security tab rather than failing
+      # the build outright, since a newly-disclosed upstream CVE with no
+      # fix available yet shouldn't block every unrelated PR.
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: HIGH,CRITICAL
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: 0
+      - name: Upload results to the Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif

@@ -1,0 +1,94 @@
+name: Backend CI
+
+# Scoped to backend-affecting changes only — see frontend-ci.yml's matching
+# comment.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-ci.yml"
+
+concurrency:
+  group: backend-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Lint, typecheck, test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: repomind
+          POSTGRES_PASSWORD: repomind
+          # CI's Postgres is always ephemeral (no dev data to protect), so
+          # the service database itself doubles as the test database —
+          # unlike local dev, which uses a separate repomind_test database
+          # (see docs/development/getting-started.md).
+          POSTGRES_DB: repomind_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U repomind"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      # Needed by the per-IP rate limiter (app/core/rate_limit.py) — its
+      # own tests, and the autouse _reset_rate_limits fixture every backend
+      # test run depends on, talk to a real Redis instance. See
+      # docs/development/testing-strategy.md.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+asyncpg://repomind:repomind@localhost:5432/repomind_test
+      REDIS_URL: redis://localhost:6379
+      # Not a real secret — a fixed, clearly-fake value that only ever
+      # signs short-lived test tokens against an ephemeral, throwaway test
+      # database. Real deployments source JWT_SECRET from that platform's
+      # own environment-secret store (see docs/deployment/ci-cd.md) — it
+      # must never be a literal in any workflow file.
+      JWT_SECRET: ci-test-secret-at-least-32-bytes-long-for-hs256
+    steps:
+      - uses: actions/checkout@v4
+
+      # enable-cache caches uv's package cache (keyed on uv.lock) across
+      # runs — `uv sync` still resolves/links every time, but skips
+      # re-downloading wheels that haven't changed.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.10.7"
+          enable-cache: true
+          cache-dependency-glob: "backend/uv.lock"
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Typecheck
+        run: uv run mypy app
+
+      - name: Test
+        run: uv run pytest -q

@@ -1,0 +1,18 @@
+title = "RepoMind gitleaks config"
+
+[extend]
+useDefault = true
+
+# Fixed, clearly-fake values used ONLY to sign short-lived tokens against
+# an ephemeral test/CI database (tests/conftest.py, backend-ci.yml) — they
+# just happen to be long/random-looking enough to trip the generic
+# high-entropy secret heuristic. Never used for anything real; allowlisted
+# by exact value (not by disabling the underlying rule) so a genuine
+# high-entropy secret anywhere else still gets caught. See
+# docs/architecture/security.md and docs/development/testing-strategy.md.
+[allowlist]
+description = "Known-safe test/CI fixture values, not real secrets"
+regexes = [
+  '''ci-test-secret-at-least-32-bytes-long-for-hs256''',
+  '''test-secret-at-least-32-bytes-long-for-hs256''',
+]

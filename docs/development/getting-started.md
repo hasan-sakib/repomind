@@ -94,6 +94,11 @@ pnpm lint && pnpm exec tsc --noEmit && pnpm test && pnpm build   # from frontend
 uv run ruff check . && uv run mypy app && uv run pytest -q   # from backend
 ```
 
-CI (`.github/workflows/ci.yml`) runs all of the above on every push and PR.
-See `docs/development/testing-strategy.md` for what's tested, how the two
-suites are organized, and the fixtures/factories both use.
+CI (`.github/workflows/frontend-ci.yml`, `backend-ci.yml`) runs all of the
+above on every push and PR, path-scoped to the app each one covers — plus
+`.github/workflows/security.yml` (dependency audits, secret detection, a
+Trivy vulnerability scan) on every push/PR and weekly. See
+`docs/deployment/ci-cd.md` for what each workflow does and the deployment
+plan they feed into, and `docs/development/testing-strategy.md` for what's
+tested, how the two suites are organized, and the fixtures/factories both
+use.

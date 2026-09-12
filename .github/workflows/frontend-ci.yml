@@ -1,0 +1,76 @@
+name: Frontend CI
+
+# Scoped to frontend-affecting changes only — a backend-only PR shouldn't
+# wait on (or pay for) a pnpm install + Next.js build. pnpm-lock.yaml and
+# pnpm-workspace.yaml live at the repo root since frontend participates in
+# the root pnpm workspace (see frontend/Dockerfile's own comment on this).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - ".github/workflows/frontend-ci.yml"
+  pull_request:
+    paths:
+      - "frontend/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - ".github/workflows/frontend-ci.yml"
+
+concurrency:
+  group: frontend-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      # cache: pnpm caches the pnpm store (keyed on pnpm-lock.yaml) via
+      # actions/setup-node's built-in support — a clean `pnpm install`
+      # still runs every time, but skips re-downloading every package.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        working-directory: .
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+        env:
+          # Not sensitive (it's the API's public base URL, already visible
+          # in the shipped client bundle) — a repo/environment *variable*,
+          # not a secret. A CI build only needs to prove the build itself
+          # succeeds, so a placeholder is fine; the real value is set on
+          # whichever platform serves the production build (see
+          # docs/deployment/ci-cd.md).
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'https://api.example.com' }}

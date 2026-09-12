@@ -91,7 +91,7 @@ for SaaS management.
 | AI         | Anthropic Claude or a free local Ollama model (Qwen/Llama/Gemma) for chat, Voyage AI (embeddings, reranking), LangGraph for retrieval orchestration |
 | Graph viz  | `@xyflow/react` (React Flow) + `@dagrejs/dagre` for layout                                                                                          |
 | Charting   | `recharts`                                                                                                                                          |
-| Deployment | Vercel (web), Railway/Fly.io (API + database)                                                                                                       |
+| Deployment | Vercel (web), Render/Railway (API + worker), Supabase (Postgres), Upstash (Redis) — see `docs/deployment/ci-cd.md`                                  |
 
 ## Repository layout
 
