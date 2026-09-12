@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import { FolderGitIcon, SparklesIcon } from "lucide-react";
+import { BookOpenIcon, FolderGitIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -94,7 +94,7 @@ export default function OnboardingRepositoryPickerPage() {
                       href={`/repositories/${repo.id}/onboarding`}
                       className="flex items-center justify-end gap-1 text-xs text-muted-foreground hover:text-foreground"
                     >
-                      <SparklesIcon className="size-3.5" />
+                      <BookOpenIcon className="size-3.5" />
                       View guide
                     </Link>
                   </TableCell>

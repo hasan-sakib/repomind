@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangleIcon,
   BarChart3Icon,
+  ClockIcon,
   FlameIcon,
   GitCommitHorizontalIcon,
   GitPullRequestIcon,
@@ -263,7 +264,7 @@ export default function AnalyticsPage({
 
       {snapshot?.status === "queued" && (
         <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-border px-6 py-16 text-center">
-          <BarChart3Icon className="size-5 animate-pulse text-brand" />
+          <ClockIcon className="size-5 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">Waiting to start…</p>
         </div>
       )}

@@ -4,9 +4,10 @@ import { use } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertTriangleIcon,
+  ClockIcon,
   ExternalLinkIcon,
   RefreshCwIcon,
-  SparklesIcon,
+  ShieldAlertIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -143,7 +144,7 @@ export default function PullRequestDetailPage({
             disabled={isActive || triggerMutation.isPending}
             onClick={() => triggerMutation.mutate(!!analysis)}
           >
-            <SparklesIcon className="size-3.5" />
+            <RefreshCwIcon className={isActive ? "size-3.5 animate-spin" : "size-3.5"} />
             {isActive
               ? "Analyzing…"
               : analysis
@@ -176,12 +177,12 @@ export default function PullRequestDetailPage({
 
       {analysisNotFound && (
         <EmptyState
-          icon={SparklesIcon}
+          icon={ShieldAlertIcon}
           title="Not analyzed yet"
           description="Run RepoMind's AI analysis to see risk level, affected components, and recommended tests for this pull request."
           action={
             <Button onClick={() => triggerMutation.mutate(false)} disabled={triggerMutation.isPending}>
-              <SparklesIcon className="size-3.5" />
+              <RefreshCwIcon className="size-3.5" />
               Analyze this PR
             </Button>
           }
@@ -197,7 +198,7 @@ export default function PullRequestDetailPage({
 
       {analysis?.status === "queued" && (
         <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-border px-6 py-16 text-center">
-          <SparklesIcon className="size-5 animate-pulse text-brand" />
+          <ClockIcon className="size-5 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">Waiting to start…</p>
         </div>
       )}

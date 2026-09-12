@@ -75,7 +75,6 @@ export function CommitFrequencyChart({
               axisLine={false}
               tickLine={false}
               allowDecimals={false}
-              width={28}
             />
             <Tooltip content={<ChartTooltip />} />
             <Bar dataKey="count" name="Commits" fill="var(--color-chart-1)" radius={[2, 2, 0, 0]} />

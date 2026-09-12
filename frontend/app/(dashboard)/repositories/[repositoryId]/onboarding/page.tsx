@@ -8,13 +8,14 @@ import {
   BookMarkedIcon,
   BookOpenIcon,
   BoxesIcon,
+  ClockIcon,
   DatabaseIcon,
+  GraduationCapIcon,
   HelpCircleIcon,
   MapIcon,
   NetworkIcon,
   RefreshCwIcon,
   ShieldIcon,
-  SparklesIcon,
   WrenchIcon,
 } from "lucide-react";
 
@@ -185,7 +186,7 @@ export default function OnboardingPage({
           disabled={isActive || triggerMutation.isPending}
           onClick={() => triggerMutation.mutate(!!guide)}
         >
-          <SparklesIcon className="size-3.5" />
+          <RefreshCwIcon className={isActive ? "size-3.5 animate-spin" : "size-3.5"} />
           {isActive ? "Generating…" : guide ? "Regenerate" : "Generate guide"}
         </Button>
       </div>
@@ -212,12 +213,12 @@ export default function OnboardingPage({
       {notOnboarded && !notIndexed && (
         <div className="mt-6">
           <EmptyState
-            icon={SparklesIcon}
+            icon={GraduationCapIcon}
             title="No onboarding guide yet"
             description="Generate one to get a repository overview, architecture summary, learning path, and more — grounded in this repository's actual code."
             action={
               <Button onClick={() => triggerMutation.mutate(false)} disabled={triggerMutation.isPending}>
-                <SparklesIcon className="size-3.5" />
+                <RefreshCwIcon className="size-3.5" />
                 Generate guide
               </Button>
             }
@@ -233,7 +234,7 @@ export default function OnboardingPage({
 
       {guide?.status === "queued" && (
         <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-lg border border-border px-6 py-16 text-center">
-          <SparklesIcon className="size-5 animate-pulse text-brand" />
+          <ClockIcon className="size-5 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">Waiting to start…</p>
         </div>
       )}

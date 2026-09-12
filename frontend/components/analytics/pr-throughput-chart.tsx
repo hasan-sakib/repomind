@@ -32,7 +32,6 @@ export function PrThroughputChart({ data }: { data: DailyPRIssueActivity[] }) {
           axisLine={false}
           tickLine={false}
           allowDecimals={false}
-          width={28}
         />
         <Tooltip content={<ChartTooltip />} />
         <Legend

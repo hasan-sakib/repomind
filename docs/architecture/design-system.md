@@ -142,6 +142,103 @@ the project's "no giant dashboard cards" rule:
   convention) renders `ErrorState` with a retry button wired to Next's
   `reset()`.
 
+## Phase 12 — professional product design audit
+
+A full pass over every screen (landing, auth, dashboard, repository
+overview, indexing, chat, architecture, PR intelligence, onboarding,
+analytics, settings, 404) at desktop/laptop/tablet/mobile widths, looking
+for AI-generated-looking visual patterns and concrete UX bugs rather than
+a redesign — the token system, card radius, and border/shadow discipline
+from earlier phases were already sound and are unchanged.
+
+**Icon language.** `SparklesIcon` had spread to six files as the generic
+marker for "this is AI-generated" (the Onboarding nav item, onboarding/PR
+regenerate buttons, empty states, and a `animate-pulse` "queued" spinner)
+— exactly the "AI sparkle icon" pattern the brief calls out. Replaced with
+icons that describe what the control actually does: `BookOpenIcon` for the
+onboarding feature identity (nav, command palette, repository quick-links),
+`RefreshCwIcon` for every regenerate/re-analyze action (already the icon
+"Sync now" used, so this now reads as one consistent verb across the app
+instead of two), and a static `ClockIcon` for "queued/waiting to start"
+states, freeing `RefreshCwIcon` + `animate-spin` to mean "actively
+running" without colliding with the queued state's old pulsing sparkle.
+
+**`Button` + `render` accessibility.** Composing `Button` with
+`render={<Link .../>}` (used for every button-styled navigation link) was
+tripping Base UI's dev-mode warning on every affected page, because the
+underlying primitive defaults `nativeButton` to `true` and a `<Link>`
+renders an `<a>`, not a `<button>`. Fixed once in `components/ui/button.tsx`
+— it now defaults `nativeButton` to `false` whenever a `render` prop is
+present — rather than patching every call site individually.
+
+**Chart Y-axis clipping.** `commit-frequency-chart.tsx` and
+`pr-throughput-chart.tsx` both hardcoded `<YAxis width={28} />`; a two-digit
+tick (e.g. "12") is wider than that, and recharts' right-aligned tick text
+was rendering partly outside the container, clipping the leading digit —
+ticks silently read as "2, 9, 5, 3" instead of "12, 9, 6, 3, 0". The
+working `repository-activity-chart.tsx` never set an explicit `width`; both
+broken charts now follow that same pattern (auto-sized axis).
+
+**Responsive fixes.** The repository overview header packed the title
+block and an eight-item action/icon-button row into one `shrink-0` flex
+row; on mobile, `shrink-0` squeezed the `min-w-0` title container to
+near-zero width and the description wrapped one word per line. Now the
+header is `flex-col` below `sm:` and the action row wraps
+(`flex-wrap`) instead of forcing a single line.
+
+**Breadcrumbs.** `security`/`usage`/`billing`/`general` were missing from
+`SEGMENT_LABELS` (rendered as raw lowercase URL segments), and the
+`repositories → /dashboard` href override applied unconditionally, so the
+"Repositories" crumb under `/settings/repositories` silently linked to
+`/dashboard` instead of staying on the settings tab. Both fixed —
+labels added, and the override now only applies when `repositories` is
+the first path segment.
+
+**Landing page.** `app/page.tsx` was a Phase 1 placeholder (a bare
+`<h1>`, a live API-health badge, two buttons). Replaced with a real,
+restrained marketing page — a header, a one-sentence hero, and a feature
+grid grounded entirely in what's actually built (chat, architecture
+explorer, PR intelligence, onboarding, analytics — the same five items in
+this repo's `README.md`), with no invented metrics, logos, or
+testimonials. The API-health `SystemStatus` badge was removed from the
+public page (it's an internal debug signal, not something a real product
+shows visitors) and deleted as dead code once nothing referenced it.
+
+**404 page.** There was no `app/not-found.tsx`, so an unmatched route fell
+through to Next's unstyled default 404. Added one matching the app's
+existing `ErrorState`-style tone (a small "404" label, a heading, a
+one-line description, a button back to `/dashboard`).
+
+**Framer Motion.** Added as a dependency and used narrowly, per the
+brief's "only where useful" instruction:
+
+- **Page transitions** — `components/shell/page-transition.tsx`, a small
+  `AnimatePresence`/`motion.div` keyed by `usePathname()`, wrapping only
+  `<main>`'s children in `app-shell.tsx` (sidebar/top nav never
+  remount/transition).
+- **Sidebar** — `nav-items.tsx`'s active item now has a `motion.div
+  layoutId` pill that slides between items on navigation, instead of a
+  static background swap. The desktop sidebar and the mobile sheet render
+  the same `NavList`, so each is given a distinct `layoutGroupId` to keep
+  their layout animations independent.
+- **Loading states** — `components/fade-in.tsx`, a small settle-in wrapper
+  applied where a skeleton is replaced by real content (repository
+  overview, PR analysis panel) — not applied blanket-wide.
+- **Hover** — a subtle `whileHover={{ y: -2 }}` lift on the landing page's
+  feature cards (`components/landing/feature-grid.tsx`). Ordinary button/
+  link hovers remain plain CSS (`hover:bg-...`), which is the right tool
+  for a color/opacity change — framer-motion was reserved for hovers doing
+  something a CSS transition can't.
+- **Command palette** — deliberately *not* framer-motion: cmdk already
+  exposes the list's measured height as `--cmdk-list-height`, so animating
+  it is one `transition-[height]` Tailwind class on `CommandList`, not a
+  new dependency.
+- **Left alone, on purpose**: the existing CSS-based Dialog/AlertDialog/
+  Sheet open/close transitions (`data-open:animate-in ...`). They already
+  work, are consistent with each other, and the brief warns against
+  animation that doesn't add anything — replacing a working transition
+  with an equivalent framer-motion one would be exactly that.
+
 ## Known gaps carried forward
 
 - No dark-mode toggle is wired up yet (tokens are fully defined and

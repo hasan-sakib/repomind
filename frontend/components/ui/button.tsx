@@ -43,11 +43,20 @@ function Button({
   className,
   variant = "default",
   size = "default",
+  // `render` is used throughout this app to compose a Button's styling and
+  // behavior onto a non-<button> element (typically next/link's <Link>, an
+  // <a>). Base UI's own default (`nativeButton: true`) assumes `render`
+  // still produces a real <button>, so default it to `false` whenever a
+  // `render` prop is passed — callers can still override explicitly.
+  nativeButton,
+  render,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
   return (
     <ButtonPrimitive
       data-slot="button"
+      render={render}
+      nativeButton={nativeButton ?? !render}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

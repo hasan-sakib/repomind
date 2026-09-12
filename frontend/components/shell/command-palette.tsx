@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import {
   BarChart3Icon,
+  BookOpenIcon,
   LayoutDashboardIcon,
   LayoutGridIcon,
   NetworkIcon,
   SettingsIcon,
-  SparklesIcon,
   UsersIcon,
 } from "lucide-react";
 
@@ -50,7 +50,7 @@ export function CommandPalette() {
               Go to architecture
             </CommandItem>
             <CommandItem value="Onboarding" onSelect={() => go("/onboarding")}>
-              <SparklesIcon />
+              <BookOpenIcon />
               Go to onboarding
             </CommandItem>
             <CommandItem value="Analytics" onSelect={() => go("/analytics")}>

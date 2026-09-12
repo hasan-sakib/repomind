@@ -8,8 +8,12 @@ import { Fragment } from "react";
 const SEGMENT_LABELS: Record<string, string> = {
   dashboard: "Dashboard",
   settings: "Settings",
+  general: "General",
   members: "Members",
   repositories: "Repositories",
+  security: "Security",
+  usage: "Usage",
+  billing: "Billing",
   connect: "Connect",
   indexing: "Indexing",
   chat: "Chat",
@@ -29,9 +33,11 @@ const UUID_LABEL_BY_PARENT: Record<string, string> = {
   chat: "Conversation",
 };
 
-// The "repositories" URL segment has no page of its own — the list lives
-// at /dashboard — so its breadcrumb must point there instead of forming
-// the literal (non-existent) /repositories URL.
+// The top-level "repositories" URL segment has no page of its own — the
+// list lives at /dashboard — so its breadcrumb must point there instead of
+// forming the literal (non-existent) /repositories URL. This only applies
+// when it's the first segment: /settings/repositories is a real page and
+// must keep its own URL.
 const SEGMENT_HREF_OVERRIDES: Record<string, string> = {
   repositories: "/dashboard",
 };
@@ -41,7 +47,9 @@ export function Breadcrumbs() {
   const segments = pathname.split("/").filter(Boolean);
 
   const crumbs = segments.map((segment, index) => {
-    const href = SEGMENT_HREF_OVERRIDES[segment] ?? `/${segments.slice(0, index + 1).join("/")}`;
+    const href =
+      (index === 0 ? SEGMENT_HREF_OVERRIDES[segment] : undefined) ??
+      `/${segments.slice(0, index + 1).join("/")}`;
     const parent = segments[index - 1];
     const label = UUID_PATTERN.test(segment)
       ? (UUID_LABEL_BY_PARENT[parent] ?? "Overview")

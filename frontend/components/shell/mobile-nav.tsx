@@ -18,7 +18,7 @@ export function MobileNav() {
           </div>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto py-3">
-          <NavList onNavigate={() => setMobileNavOpen(false)} />
+          <NavList onNavigate={() => setMobileNavOpen(false)} layoutGroupId="mobile-nav" />
         </div>
       </SheetContent>
     </Sheet>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BarChart3Icon,
+  BookOpenIcon,
   ExternalLinkIcon,
   GitBranchIcon,
   GitCommitHorizontalIcon,
@@ -17,12 +18,12 @@ import {
   StarIcon,
   GitForkIcon,
   SettingsIcon,
-  SparklesIcon,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/error-state";
+import { FadeIn } from "@/components/fade-in";
 import { RepositoryStatusBadge } from "@/components/repository/status-badge";
 import { getRepositoryOverview, syncRepositoryNow } from "@/lib/api/repositories";
 import { formatRelativeTime } from "@/lib/format-time";
@@ -88,8 +89,8 @@ export default function RepositoryOverviewPage({
   const isSyncing = repository.status === "syncing";
 
   return (
-    <div className="mx-auto max-w-4xl space-y-4 px-4 py-6 sm:px-6">
-      <div className="flex items-start justify-between gap-3">
+    <FadeIn className="mx-auto max-w-4xl space-y-4 px-4 py-6 sm:px-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="truncate text-lg font-semibold tracking-tight">
@@ -110,7 +111,7 @@ export default function RepositoryOverviewPage({
             <p className="mt-1 text-sm text-muted-foreground">{repository.description}</p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
           <Button size="sm" render={<Link href={`/repositories/${repositoryId}/chat`} />}>
             <MessageSquareIcon className="size-3.5" />
             Chat
@@ -154,7 +155,7 @@ export default function RepositoryOverviewPage({
             render={<Link href={`/repositories/${repositoryId}/onboarding`} />}
             aria-label="Onboarding"
           >
-            <SparklesIcon className="size-4" />
+            <BookOpenIcon className="size-4" />
           </Button>
           <Button
             variant="ghost"
@@ -278,7 +279,7 @@ export default function RepositoryOverviewPage({
           ))}
         </OverviewSection>
       </div>
-    </div>
+    </FadeIn>
   );
 }
 

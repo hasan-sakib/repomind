@@ -5,6 +5,7 @@ import {
   FlaskConicalIcon,
 } from "lucide-react";
 
+import { FadeIn } from "@/components/fade-in";
 import { FileChip } from "@/components/file-chip";
 import { Badge } from "@/components/ui/badge";
 import { buildBlobUrl } from "@/lib/github-url";
@@ -31,7 +32,7 @@ export function AnalysisPanel({
   );
 
   return (
-    <div className="space-y-6">
+    <FadeIn className="space-y-6">
       <div className="flex flex-wrap items-center gap-2">
         {analysis.risk_level && <RiskBadge level={analysis.risk_level} />}
         <span className="text-xs text-muted-foreground">
@@ -166,6 +167,6 @@ export function AnalysisPanel({
           </div>
         </section>
       )}
-    </div>
+    </FadeIn>
   );
 }
