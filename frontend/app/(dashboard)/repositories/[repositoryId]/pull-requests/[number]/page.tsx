@@ -34,7 +34,19 @@ export default function PullRequestDetailPage({
   params: Promise<{ repositoryId: string; number: string }>;
 }) {
   const { repositoryId, number: numberParam } = use(params);
-  const number = Number(numberParam);
+  return <PullRequestDetailView repositoryId={repositoryId} number={Number(numberParam)} />;
+}
+
+/** Split from the default export so tests can render it directly with
+ * plain props, instead of exercising `use()` on a route param Promise —
+ * see docs/development/testing-strategy.md. */
+export function PullRequestDetailView({
+  repositoryId,
+  number,
+}: {
+  repositoryId: string;
+  number: number;
+}) {
   const queryClient = useQueryClient();
   const { status: connectionStatus } = useRealtime();
 

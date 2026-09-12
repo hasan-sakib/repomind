@@ -42,8 +42,18 @@ def test_decode_rejects_expired_token() -> None:
 
 
 def test_decode_rejects_wrong_signature() -> None:
+    # Tamper with the *first* character of the signature segment, not the
+    # last character of the whole token: base64url's final character in an
+    # unpadded, non-multiple-of-3-bytes segment (a 32-byte HMAC-SHA256
+    # signature is exactly this) can encode as few as 2 real bits, so
+    # flipping it doesn't always change the decoded byte and made this
+    # test genuinely flaky (~20% failure rate). The first character always
+    # encodes real, non-padding bits, so this reliably changes the
+    # signature's actual bytes every run.
     token = create_access_token(uuid.uuid4(), uuid.uuid4())
-    tampered = token[:-1] + ("A" if token[-1] != "A" else "B")
+    header, payload, signature = token.split(".")
+    tampered_char = "A" if signature[0] != "A" else "B"
+    tampered = f"{header}.{payload}.{tampered_char}{signature[1:]}"
     with pytest.raises(InvalidTokenError):
         decode_access_token(tampered)
 

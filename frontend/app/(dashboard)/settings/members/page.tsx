@@ -237,7 +237,7 @@ export default function MembersPage() {
   );
 }
 
-function AddMemberDialog({
+export function AddMemberDialog({
   open,
   onOpenChange,
   organizationId,

@@ -33,6 +33,13 @@ export default function RepositoryIndexingPage({
   params: Promise<{ repositoryId: string }>;
 }) {
   const { repositoryId } = use(params);
+  return <RepositoryIndexingView repositoryId={repositoryId} />;
+}
+
+/** Split from the default export so tests can render it directly with a
+ * plain `repositoryId` string, instead of exercising `use()` on a route
+ * param Promise — see docs/development/testing-strategy.md. */
+export function RepositoryIndexingView({ repositoryId }: { repositoryId: string }) {
   const queryClient = useQueryClient();
   const { status: connectionStatus } = useRealtime();
 

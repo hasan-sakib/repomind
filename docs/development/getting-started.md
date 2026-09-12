@@ -88,10 +88,12 @@ Notes:
 
 ```bash
 # Frontend
-pnpm lint && pnpm exec tsc --noEmit && pnpm build   # from frontend
+pnpm lint && pnpm exec tsc --noEmit && pnpm test && pnpm build   # from frontend
 
 # Backend
 uv run ruff check . && uv run mypy app && uv run pytest -q   # from backend
 ```
 
 CI (`.github/workflows/ci.yml`) runs all of the above on every push and PR.
+See `docs/development/testing-strategy.md` for what's tested, how the two
+suites are organized, and the fixtures/factories both use.

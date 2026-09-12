@@ -29,6 +29,7 @@ jobs:
         working-directory: .
       - run: pnpm lint
       - run: pnpm exec tsc --noEmit
+      - run: pnpm test
       - run: pnpm build
 
   api:
@@ -54,9 +55,22 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      # Needed by the per-IP rate limiter (app/core/rate_limit.py) — its
+      # tests, and the autouse _reset_rate_limits fixture every test run
+      # depends on, talk to a real Redis instance.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
     env:
       ENVIRONMENT: test
       DATABASE_URL: postgresql+asyncpg://repomind:repomind@localhost:5432/repomind_test
+      REDIS_URL: redis://localhost:6379
       JWT_SECRET: ci-test-secret-at-least-32-bytes-long-for-hs256
     steps:
       - uses: actions/checkout@v4

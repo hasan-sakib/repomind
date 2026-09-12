@@ -69,7 +69,9 @@ def _mock_github_app_endpoints(httpx_mock: HTTPXMock) -> None:
     httpx_mock.add_response(url=ISSUES_URL, json=[], is_reusable=True, is_optional=True)
 
 
-async def _connect_installation(client: AsyncClient, organization_id: str) -> None:
+async def _connect_installation(
+    client: AsyncClient, organization_id: str, *, installation_id: int = 999
+) -> None:
     install_response = await client.get(f"/api/v1/organizations/{organization_id}/github/install")
     assert install_response.status_code in (302, 307)
     state = client.cookies.get("rm_github_install_state")
@@ -78,7 +80,7 @@ async def _connect_installation(client: AsyncClient, organization_id: str) -> No
 
     callback_response = await client.get(
         "/api/v1/github/callback",
-        params={"installation_id": "999", "state": state_token},
+        params={"installation_id": str(installation_id), "state": state_token},
     )
     assert callback_response.status_code in (302, 307)
 
