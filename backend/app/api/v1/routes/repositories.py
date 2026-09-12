@@ -33,6 +33,7 @@ from app.schemas.github import (
     RepositoryPublic,
 )
 from app.schemas.indexing import IndexingJobPublic, TriggerIndexingResponse
+from app.schemas.repository_membership import GrantRepositoryAccessRequest, RepositoryMemberPublic
 from app.services import indexing_service, organization_service, repository_service
 from app.services.exceptions import InsufficientRoleError
 
@@ -166,13 +167,78 @@ async def disconnect_repository(
     db: DbSession,
     user: Annotated[User, Depends(get_current_user)],
 ) -> None:
+    await _require_admin_membership(db, repository, user)
+    await repository_service.disconnect_repository(
+        db, repository=repository, actor_user_id=user.id, audit_ip=_client_ip(request)
+    )
+
+
+async def _require_admin_membership(
+    db: DbSession, repository: Repository, user: User
+) -> OrganizationMember:
     actor = await organization_service.get_membership_or_raise(
         db, organization_id=repository.organization_id, user_id=user.id
     )
     if not role_at_least(actor.role, Role.ADMIN):
         raise InsufficientRoleError("Requires at least admin role")
-    await repository_service.disconnect_repository(
-        db, repository=repository, actor_user_id=user.id, audit_ip=_client_ip(request)
+    return actor
+
+
+@router.get("/{repository_id}/members", response_model=list[RepositoryMemberPublic])
+async def list_repository_members(
+    repository: Annotated[Repository, Depends(require_repository_access)],
+    db: DbSession,
+    user: Annotated[User, Depends(get_current_user)],
+) -> list[RepositoryMemberPublic]:
+    await _require_admin_membership(db, repository, user)
+    members = await repository_service.list_repository_members(db, repository.id)
+    return [RepositoryMemberPublic.from_membership(m) for m in members]
+
+
+@router.post(
+    "/{repository_id}/members",
+    response_model=RepositoryMemberPublic,
+    status_code=201,
+    dependencies=[Depends(require_csrf_header)],
+)
+async def grant_repository_access(
+    body: GrantRepositoryAccessRequest,
+    repository: Annotated[Repository, Depends(require_repository_access)],
+    request: Request,
+    db: DbSession,
+    user: Annotated[User, Depends(get_current_user)],
+) -> RepositoryMemberPublic:
+    await _require_admin_membership(db, repository, user)
+    membership = await repository_service.grant_repository_access(
+        db,
+        repository=repository,
+        target_user_id=body.user_id,
+        actor_user_id=user.id,
+        audit_ip=_client_ip(request),
+    )
+    await db.refresh(membership, attribute_names=["user"])
+    return RepositoryMemberPublic.from_membership(membership)
+
+
+@router.delete(
+    "/{repository_id}/members/{target_user_id}",
+    status_code=204,
+    dependencies=[Depends(require_csrf_header)],
+)
+async def revoke_repository_access(
+    target_user_id: uuid.UUID,
+    repository: Annotated[Repository, Depends(require_repository_access)],
+    request: Request,
+    db: DbSession,
+    user: Annotated[User, Depends(get_current_user)],
+) -> None:
+    await _require_admin_membership(db, repository, user)
+    await repository_service.revoke_repository_access(
+        db,
+        repository=repository,
+        target_user_id=target_user_id,
+        actor_user_id=user.id,
+        audit_ip=_client_ip(request),
     )
 
 

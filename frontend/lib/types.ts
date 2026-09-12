@@ -7,7 +7,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   viewer: "Viewer",
 };
 
-// Ordered highest to lowest privilege — mirrors app/domain/role.py on the backend.
+// Ordered highest to lowest privilege — mirrors app/models/role.py on the backend.
 export const ROLE_RANK: Record<Role, number> = {
   owner: 3,
   admin: 2,
@@ -28,10 +28,82 @@ export interface User {
   created_at: string;
 }
 
+export type Plan = "free" | "pro" | "team";
+
+export const PLAN_LABELS: Record<Plan, string> = {
+  free: "Free",
+  pro: "Pro",
+  team: "Team",
+};
+
 export interface Organization {
   id: string;
   name: string;
   slug: string;
+  plan: Plan;
+  created_at: string;
+}
+
+// Billing/entitlements (app/billing/ on the backend) — see
+// docs/architecture/0011-saas-management.md.
+export interface PlanLimits {
+  max_repositories: number | null;
+  max_members: number | null;
+}
+
+export interface UsageSummary {
+  plan: Plan;
+  limits: PlanLimits;
+  repositories_used: number;
+  members_used: number;
+  ai_tokens_used: number;
+  indexing_runs: number;
+  pr_analyses_run: number;
+  onboarding_guides_generated: number;
+  analytics_snapshots_generated: number;
+}
+
+export interface PlanCatalogEntry {
+  plan: Plan;
+  label: string;
+  limits: PlanLimits;
+}
+
+export interface BillingInfo {
+  current_plan: Plan;
+  is_billing_configured: boolean;
+  plans: PlanCatalogEntry[];
+}
+
+export interface AuditLogEntry {
+  id: string;
+  action: string;
+  actor_user_id: string | null;
+  target_type: string | null;
+  target_id: string | null;
+  ip_address: string | null;
+  extra: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface ApiKey {
+  id: string;
+  name: string;
+  key_prefix: string;
+  role: Role;
+  created_by: User | null;
+  last_used_at: string | null;
+  revoked_at: string | null;
+  created_at: string;
+}
+
+export interface ApiKeyCreated extends ApiKey {
+  // Only present once, on the response to the create call.
+  secret: string;
+}
+
+export interface RepositoryMember {
+  user: User;
   created_at: string;
 }
 

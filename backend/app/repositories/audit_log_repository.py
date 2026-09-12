@@ -1,8 +1,21 @@
 import uuid
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.audit_log import AuditLog
+
+
+async def list_for_organization(
+    db: AsyncSession, organization_id: uuid.UUID, *, limit: int = 50
+) -> list[AuditLog]:
+    result = await db.execute(
+        select(AuditLog)
+        .where(AuditLog.organization_id == organization_id)
+        .order_by(AuditLog.created_at.desc())
+        .limit(limit)
+    )
+    return list(result.scalars().all())
 
 
 def create(

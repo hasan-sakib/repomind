@@ -108,6 +108,11 @@ class Settings(BaseSettings):
     analytics_stale_issue_days: int = 30
     analytics_top_hotspots: int = 15
 
+    # Billing provider — see app/billing/provider.py. "null" (the only
+    # option today) means no real subscription billing is wired up; plan
+    # changes happen directly via organization_service.set_plan.
+    billing_provider: Literal["null"] = "null"
+
 
 @lru_cache
 def get_settings() -> Settings:

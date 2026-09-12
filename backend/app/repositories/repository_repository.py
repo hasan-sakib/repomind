@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -11,6 +11,15 @@ from app.models.repository_status import RepositoryStatus
 
 async def get_by_id(db: AsyncSession, repository_id: uuid.UUID) -> Repository | None:
     return await db.get(Repository, repository_id)
+
+
+async def count_for_organization(db: AsyncSession, organization_id: uuid.UUID) -> int:
+    result = await db.execute(
+        select(func.count())
+        .select_from(Repository)
+        .where(Repository.organization_id == organization_id)
+    )
+    return result.scalar_one()
 
 
 async def get_by_github_repo_id(

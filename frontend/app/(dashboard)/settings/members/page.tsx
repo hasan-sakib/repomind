@@ -268,6 +268,8 @@ function AddMemberDialog({
         setError("No registered user with that email. They need to sign up first.");
       } else if (err instanceof ApiError && err.code === "member_already_exists") {
         setError("That person is already a member.");
+      } else if (err instanceof ApiError && err.code === "plan_limit_reached") {
+        setError(err.message || "Your plan's member limit has been reached.");
       } else {
         setError("Something went wrong. Please try again.");
       }

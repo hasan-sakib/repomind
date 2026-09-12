@@ -43,3 +43,7 @@ def create(
     membership = RepositoryMembership(repository_id=repository_id, user_id=user_id)
     db.add(membership)
     return membership
+
+
+async def delete(db: AsyncSession, membership: RepositoryMembership) -> None:
+    await db.delete(membership)

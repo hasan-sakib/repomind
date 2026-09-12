@@ -2,9 +2,12 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.billing import entitlements
 from app.core.slugify import slugify
+from app.models.audit_log import AuditLog
 from app.models.organization import Organization
 from app.models.organization_member import OrganizationMember
+from app.models.plan import Plan
 from app.models.role import Role, role_at_least
 from app.models.user import User
 from app.repositories import (
@@ -114,6 +117,9 @@ async def add_member(
     if existing is not None:
         raise MemberAlreadyExistsError("User is already a member of this organization")
 
+    organization = await entitlements.get_organization_or_raise(db, organization_id)
+    await entitlements.ensure_can_add_member(db, organization)
+
     member = organization_member_repository.create(
         db, organization_id=organization_id, user_id=target_user.id, role=role
     )
@@ -217,3 +223,73 @@ async def remove_member(
         ip_address=audit_ip,
     )
     await db.commit()
+
+
+async def update_organization(
+    db: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    actor: OrganizationMember,
+    name: str,
+    audit_ip: str | None = None,
+) -> Organization:
+    organization = await organization_repository.get_by_id(db, organization_id)
+    if organization is None:
+        raise OrganizationNotFoundError("Organization not found")
+
+    organization_repository.update_name(organization, name=name)
+    audit_log_repository.create(
+        db,
+        action="organization.renamed",
+        actor_user_id=actor.user_id,
+        organization_id=organization_id,
+        target_type="organization",
+        target_id=str(organization_id),
+        ip_address=audit_ip,
+        extra={"name": name},
+    )
+    await db.commit()
+    await db.refresh(organization)
+    return organization
+
+
+async def set_plan(
+    db: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    actor: OrganizationMember,
+    plan: Plan,
+    audit_ip: str | None = None,
+) -> Organization:
+    """The interim, no-billing-provider way to change plans (see
+    app/billing/provider.py's NullBillingProvider) — owner-only since it
+    bypasses any real payment step entirely. Once a real BillingProvider
+    is wired up, its webhook handler becomes the only other writer of
+    `organization.plan`; this endpoint stays as the manual override it
+    already is."""
+    if actor.role != Role.OWNER:
+        raise InsufficientRoleError("Only an owner can change the organization's plan")
+
+    organization = await organization_repository.get_by_id(db, organization_id)
+    if organization is None:
+        raise OrganizationNotFoundError("Organization not found")
+
+    previous_plan = organization.plan
+    organization_repository.update_plan(organization, plan=plan)
+    audit_log_repository.create(
+        db,
+        action="organization.plan_changed",
+        actor_user_id=actor.user_id,
+        organization_id=organization_id,
+        target_type="organization",
+        target_id=str(organization_id),
+        ip_address=audit_ip,
+        extra={"from": previous_plan.value, "to": plan.value},
+    )
+    await db.commit()
+    await db.refresh(organization)
+    return organization
+
+
+async def list_audit_logs(db: AsyncSession, organization_id: uuid.UUID) -> list[AuditLog]:
+    return await audit_log_repository.list_for_organization(db, organization_id)

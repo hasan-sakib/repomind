@@ -151,3 +151,18 @@ class RepositoryNotIndexedError(AppError):
 class AnalyticsSnapshotNotFoundError(AppError):
     status_code = 404
     code = "analytics_snapshot_not_found"
+
+
+class PlanLimitReachedError(AppError):
+    status_code = 402
+    code = "plan_limit_reached"
+
+
+class ApiKeyNotFoundError(AppError):
+    status_code = 404
+    code = "api_key_not_found"
+
+
+class BillingNotConfiguredError(AppError):
+    status_code = 501
+    code = "billing_not_configured"

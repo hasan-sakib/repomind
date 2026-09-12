@@ -8,8 +8,8 @@ insight grounded in the actual code — not a generic AI chat wrapper.
 
 Authentication, multi-tenancy, GitHub integration, codebase indexing, the
 AI/RAG chat engine, the architecture/dependency explorer, AI pull request
-intelligence, automatic developer onboarding, engineering analytics, and
-real-time infrastructure are complete and tested:
+intelligence, automatic developer onboarding, engineering analytics,
+real-time infrastructure, and SaaS management are complete and tested:
 email/password auth, GitHub OAuth login, organizations with role-based
 authorization (owner/admin/developer/viewer), password reset, email
 verification, a GitHub App connection flow, a repository overview
@@ -43,8 +43,17 @@ unified WebSocket event system pushing indexing progress, repository
 sync, webhook processing, and AI generation status straight into the
 frontend's cache with no polling refresh while connected, a reconnecting
 connection with backoff and a live connection-status indicator, and a
-wired-up notification bell) — all backed by a real database and
-270 passing backend tests. See
+wired-up notification bell) — and SaaS management (a centralized
+entitlement system enforcing Free/Pro/Team plan limits — e.g. 3/25/
+unlimited connected repositories — through one module rather than
+scattered checks; organization rename, member roles, and per-repository
+access management; organization-scoped API keys with hashed storage and
+one-time secret reveal; a usage dashboard combining plan quotas with
+real AI-token and generation-run counts; an admin-visible audit log; and
+a billing-provider abstraction with a Null implementation and an
+interim, owner-only manual plan switch while no real payment provider is
+configured) — all backed by a real database and
+294 passing backend tests. See
 [`docs/product/README.md`](docs/product/README.md) for scope,
 [`docs/architecture/0001-foundation.md`](docs/architecture/0001-foundation.md)
 for the initial architecture,
@@ -65,7 +74,9 @@ for developer onboarding, and
 [`docs/architecture/0009-engineering-analytics.md`](docs/architecture/0009-engineering-analytics.md)
 for engineering analytics, and
 [`docs/architecture/0010-realtime-infrastructure.md`](docs/architecture/0010-realtime-infrastructure.md)
-for real-time infrastructure.
+for real-time infrastructure, and
+[`docs/architecture/0011-saas-management.md`](docs/architecture/0011-saas-management.md)
+for SaaS management.
 
 ## Stack
 

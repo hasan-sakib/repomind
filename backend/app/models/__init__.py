@@ -4,6 +4,7 @@ and so string-based relationship() references between modules resolve."""
 from app.models.ai_run import AiRun
 from app.models.analytics_snapshot import AnalyticsSnapshot
 from app.models.analytics_status import AnalyticsSnapshotStatus
+from app.models.api_key import ApiKey
 from app.models.audit_log import AuditLog
 from app.models.branch import Branch
 from app.models.chat_status import (
@@ -30,6 +31,7 @@ from app.models.onboarding_progress import OnboardingProgress
 from app.models.onboarding_status import OnboardingGuideStatus
 from app.models.organization import Organization
 from app.models.organization_member import OrganizationMember
+from app.models.plan import Plan
 from app.models.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
 from app.models.pull_request import PullRequest
 from app.models.pull_request_analysis import PullRequestAnalysis
@@ -48,6 +50,7 @@ __all__ = [
     "AiRunStatus",
     "AnalyticsSnapshot",
     "AnalyticsSnapshotStatus",
+    "ApiKey",
     "AuditLog",
     "Branch",
     "CodeChunk",
@@ -73,6 +76,7 @@ __all__ = [
     "OrganizationMember",
     "PRAnalysisStatus",
     "PRRiskLevel",
+    "Plan",
     "PullRequest",
     "PullRequestAnalysis",
     "QueryIntent",

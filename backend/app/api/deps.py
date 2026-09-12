@@ -18,9 +18,9 @@ from app.models.repository import Repository
 from app.models.role import Role
 from app.models.session import Session
 from app.models.user import User
-from app.repositories import session_repository, user_repository
-from app.services import organization_service, repository_service
-from app.services.exceptions import CsrfError, NotAuthenticatedError
+from app.repositories import repository_repository, session_repository, user_repository
+from app.services import api_key_service, organization_service, repository_service
+from app.services.exceptions import CsrfError, NotAuthenticatedError, RepositoryNotFoundError
 
 SESSION_COOKIE_NAME = "rm_session"
 REFRESH_COOKIE_NAME = "rm_refresh"
@@ -116,12 +116,28 @@ def require_organization_role(
 
 async def require_repository_access(
     db: DbSession,
-    user: Annotated[User, Depends(get_current_user)],
     repository_id: Annotated[uuid.UUID, Path()],
+    authorization: Annotated[str | None, Header()] = None,
+    rm_session: Annotated[str | None, Cookie()] = None,
 ) -> Repository:
-    """Loads the {repository_id} path param, enforcing that the caller has
-    a RepositoryMembership row for it — see
-    repository_service.require_repository_access."""
+    """Loads the {repository_id} path param, enforcing that the caller can
+    see it — via either credential: an `Authorization: Bearer <api key>`
+    header (organization-scoped, no user — see app/services/
+    api_key_service.py), or the `rm_session` cookie (user-scoped,
+    RepositoryMembership-based — see repository_service.
+    require_repository_access). Only this dependency accepts API-key auth
+    today, not every route in the app — see
+    docs/architecture/0011-saas-management.md for that scope decision."""
+    if authorization is not None:
+        scheme, _, secret = authorization.partition(" ")
+        if scheme.lower() == "bearer" and secret:
+            api_key = await api_key_service.authenticate(db, secret)
+            repository = await repository_repository.get_by_id(db, repository_id)
+            if repository is None or repository.organization_id != api_key.organization_id:
+                raise RepositoryNotFoundError("Repository not found")
+            return repository
+
+    user, _session = await get_current_user_and_session(db, rm_session)
     return await repository_service.require_repository_access(
         db, repository_id=repository_id, user_id=user.id
     )

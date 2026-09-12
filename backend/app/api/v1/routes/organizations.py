@@ -9,17 +9,28 @@ from app.api.deps import (
     require_csrf_header,
     require_organization_role,
 )
+from app.billing import entitlements
+from app.billing.factory import get_billing_provider
+from app.billing.plans import PLAN_LABELS, PLAN_LIMITS
+from app.billing.usage import get_usage_summary
 from app.models.organization_member import OrganizationMember
 from app.models.role import Role
 from app.models.user import User
 from app.repositories import organization_repository
 from app.schemas.organization import (
     AddMemberRequest,
+    AuditLogPublic,
+    BillingInfoPublic,
     MemberPublic,
     OrganizationCreateRequest,
     OrganizationMembershipPublic,
     OrganizationPublic,
+    PlanCatalogEntryPublic,
+    PlanLimitsPublic,
+    SetPlanRequest,
     UpdateMemberRoleRequest,
+    UpdateOrganizationRequest,
+    UsageSummaryPublic,
 )
 from app.services import organization_service
 
@@ -64,6 +75,92 @@ async def get_organization(
     organization = await organization_repository.get_by_id(db, member.organization_id)
     assert organization is not None  # FK guarantees this if the membership row exists
     return OrganizationPublic.from_organization(organization)
+
+
+@router.patch(
+    "/{organization_id}",
+    response_model=OrganizationPublic,
+    dependencies=[Depends(require_csrf_header)],
+)
+async def update_organization(
+    body: UpdateOrganizationRequest,
+    request: Request,
+    db: DbSession,
+    actor: Annotated[OrganizationMember, Depends(require_organization_role(Role.ADMIN))],
+) -> OrganizationPublic:
+    organization = await organization_service.update_organization(
+        db,
+        organization_id=actor.organization_id,
+        actor=actor,
+        name=body.name,
+        audit_ip=_client_ip(request),
+    )
+    return OrganizationPublic.from_organization(organization)
+
+
+@router.post(
+    "/{organization_id}/plan",
+    response_model=OrganizationPublic,
+    dependencies=[Depends(require_csrf_header)],
+)
+async def set_plan(
+    body: SetPlanRequest,
+    request: Request,
+    db: DbSession,
+    actor: Annotated[OrganizationMember, Depends(require_organization_role(Role.VIEWER))],
+) -> OrganizationPublic:
+    # Minimum role is VIEWER at the route level (same reasoning as
+    # remove_member above) — organization_service.set_plan enforces the
+    # real rule (owner-only).
+    organization = await organization_service.set_plan(
+        db,
+        organization_id=actor.organization_id,
+        actor=actor,
+        plan=body.plan,
+        audit_ip=_client_ip(request),
+    )
+    return OrganizationPublic.from_organization(organization)
+
+
+@router.get("/{organization_id}/usage", response_model=UsageSummaryPublic)
+async def get_usage(
+    member: Annotated[OrganizationMember, Depends(require_organization_role(Role.VIEWER))],
+    db: DbSession,
+) -> UsageSummaryPublic:
+    organization = await organization_repository.get_by_id(db, member.organization_id)
+    assert organization is not None
+    usage = await get_usage_summary(db, organization)
+    return UsageSummaryPublic.from_usage(
+        plan=organization.plan, limits=entitlements.get_limits(organization), usage=usage
+    )
+
+
+@router.get("/{organization_id}/billing", response_model=BillingInfoPublic)
+async def get_billing_info(
+    member: Annotated[OrganizationMember, Depends(require_organization_role(Role.VIEWER))],
+    db: DbSession,
+) -> BillingInfoPublic:
+    organization = await organization_repository.get_by_id(db, member.organization_id)
+    assert organization is not None
+    return BillingInfoPublic(
+        current_plan=organization.plan,
+        is_billing_configured=get_billing_provider().is_configured,
+        plans=[
+            PlanCatalogEntryPublic(
+                plan=plan, label=PLAN_LABELS[plan], limits=PlanLimitsPublic.from_limits(limits)
+            )
+            for plan, limits in PLAN_LIMITS.items()
+        ],
+    )
+
+
+@router.get("/{organization_id}/audit-logs", response_model=list[AuditLogPublic])
+async def get_audit_logs(
+    member: Annotated[OrganizationMember, Depends(require_organization_role(Role.ADMIN))],
+    db: DbSession,
+) -> list[AuditLogPublic]:
+    entries = await organization_service.list_audit_logs(db, member.organization_id)
+    return [AuditLogPublic.from_audit_log(e) for e in entries]
 
 
 @router.get("/{organization_id}/members", response_model=list[MemberPublic])

@@ -5,6 +5,7 @@ import type {
   Issue,
   PullRequest,
   Repository,
+  RepositoryMember,
   RepositoryOverview,
 } from "@/lib/types";
 
@@ -53,4 +54,24 @@ export function listPullRequests(
 export function listIssues(repositoryId: string, state?: "open" | "closed"): Promise<Issue[]> {
   const query = state ? `?state=${state}` : "";
   return apiFetch(`/api/v1/repositories/${repositoryId}/issues${query}`);
+}
+
+export function listRepositoryMembers(repositoryId: string): Promise<RepositoryMember[]> {
+  return apiFetch(`/api/v1/repositories/${repositoryId}/members`);
+}
+
+export function grantRepositoryAccess(
+  repositoryId: string,
+  userId: string,
+): Promise<RepositoryMember> {
+  return apiFetch(`/api/v1/repositories/${repositoryId}/members`, {
+    method: "POST",
+    body: JSON.stringify({ user_id: userId }),
+  });
+}
+
+export function revokeRepositoryAccess(repositoryId: string, userId: string): Promise<void> {
+  return apiFetch(`/api/v1/repositories/${repositoryId}/members/${userId}`, {
+    method: "DELETE",
+  });
 }

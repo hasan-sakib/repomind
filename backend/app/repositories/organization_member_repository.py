@@ -42,6 +42,15 @@ async def list_for_organization(
     return list(result.scalars().all())
 
 
+async def count_for_organization(db: AsyncSession, organization_id: uuid.UUID) -> int:
+    result = await db.execute(
+        select(func.count())
+        .select_from(OrganizationMember)
+        .where(OrganizationMember.organization_id == organization_id)
+    )
+    return result.scalar_one()
+
+
 async def count_with_role(db: AsyncSession, *, organization_id: uuid.UUID, role: Role) -> int:
     result = await db.execute(
         select(func.count())
