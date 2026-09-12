@@ -29,5 +29,64 @@ services:
       timeout: 5s
       retries: 10
 
+  # `api` and `worker` share one image (backend/Dockerfile) — same shape as
+  # the two Fly.io process groups described in docs/deployment/deployment.md,
+  # just running as two compose services instead. Secrets (JWT_SECRET,
+  # GITHUB_*, ANTHROPIC_API_KEY, VOYAGE_API_KEY, ...) come from backend/.env,
+  # which you already need for native local dev — see backend/.env.example.
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # Overrides backend/.env's localhost values — inside the compose
+      # network, Postgres/Redis are reachable by service name, not
+      # localhost. If AI_PROVIDER=ollama, OLLAMA_HOST must similarly point
+      # somewhere reachable from inside the container, e.g.
+      # http://host.docker.internal:11434 for Ollama running on the host.
+      DATABASE_URL: postgresql+asyncpg://repomind:repomind@postgres:5432/repomind
+      REDIS_URL: redis://redis:6379
+      FRONTEND_URL: http://localhost:3000
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://repomind:repomind@postgres:5432/repomind
+      REDIS_URL: redis://redis:6379
+    command: arq app.workers.settings.WorkerSettings
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        # Baked into the client bundle at build time (Next.js NEXT_PUBLIC_*
+        # rule) — override with --build-arg if the API isn't on localhost.
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
 volumes:
   repomind_postgres_data:

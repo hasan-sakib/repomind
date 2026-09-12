@@ -1,0 +1,26 @@
+# Used as the build context for frontend/Dockerfile (context: ..). Keep this
+# in sync with .gitignore's spirit — anything that gets reinstalled/rebuilt
+# inside the image shouldn't be copied in from the host.
+node_modules/
+**/node_modules/
+.next/
+**/.next/
+.turbo/
+.pnpm-store/
+
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/.mypy_cache/
+
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+.git/
+.github/
+docs/
+*.md

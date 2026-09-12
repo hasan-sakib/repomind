@@ -42,6 +42,48 @@ pnpm dev
 - API: http://localhost:8000 (docs at `/docs` outside production)
 - Web: http://localhost:3000
 
+## Running everything in Docker
+
+The setup above runs Postgres/Redis in Docker and the API/worker/web apps
+natively, which is the faster inner loop (no image rebuild per code change)
+and is what CI and the steps above assume. To instead run the **entire**
+stack in containers — e.g. to sanity-check a production-shaped build, or to
+hand someone a single command that doesn't require Python/Node installed
+locally:
+
+```bash
+cp backend/.env.example backend/.env   # fill in secrets first — see below
+docker compose up -d --build
+```
+
+This builds `backend/Dockerfile` (shared by the `api` and `worker`
+services — same image, different `command:`, mirroring the two Fly.io
+process groups in `docs/deployment/deployment.md`) and `frontend/Dockerfile`
+(built with the repo root as context, since `frontend` participates in the
+root pnpm workspace), then starts all five services. `api`'s command runs
+`alembic upgrade head` before `uvicorn` starts, so migrations are applied
+automatically on every `up`.
+
+- API: http://localhost:8000
+- Web: http://localhost:3000
+
+Notes:
+
+- `backend/.env` supplies secrets (`JWT_SECRET`, `GITHUB_*`,
+  `ANTHROPIC_API_KEY`, `VOYAGE_API_KEY`, ...) via `env_file:` in
+  `docker-compose.yml`; `DATABASE_URL`/`REDIS_URL` are overridden in the
+  compose file itself to point at the `postgres`/`redis` service names
+  instead of `localhost`, since containers don't share the host's network.
+- If `AI_PROVIDER=ollama`, point `OLLAMA_HOST` at
+  `http://host.docker.internal:11434` (not `localhost`) so the `api`/
+  `worker` containers can reach Ollama running on the host.
+- `NEXT_PUBLIC_API_URL` is baked into the `web` image at *build* time
+  (Next.js inlines `NEXT_PUBLIC_*` vars into the client bundle) — override
+  it via `docker compose build --build-arg NEXT_PUBLIC_API_URL=... web` if
+  the API isn't reachable at `http://localhost:8000` from the browser.
+- `docker compose down` stops everything; add `-v` to also drop the
+  Postgres data volume.
+
 ## Quality gates
 
 ```bash
