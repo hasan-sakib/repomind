@@ -110,7 +110,7 @@ jobs:
       # Settings → Actions → General change — see
       # docs/deployment/ci-cd.md's known gaps.)
       - name: Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
