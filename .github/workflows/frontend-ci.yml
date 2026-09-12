@@ -38,9 +38,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # No `version:` input here on purpose — frontend/package.json's own
+      # "packageManager": "pnpm@9.15.9" field is the version's single
+      # source of truth. Passing both makes pnpm/action-setup@v4 refuse to
+      # start ("Multiple versions of pnpm specified").
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       # cache: pnpm caches the pnpm store (keyed on pnpm-lock.yaml) via
       # actions/setup-node's built-in support — a clean `pnpm install`

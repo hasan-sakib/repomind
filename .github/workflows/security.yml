@@ -31,9 +31,9 @@ jobs:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
+      # No `version:` input — see frontend-ci.yml's matching comment;
+      # frontend/package.json's "packageManager" field is authoritative.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -96,29 +96,24 @@ jobs:
   vulnerability-scan:
     name: Vulnerability scan (Trivy)
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      # Required to upload SARIF results to the repo's Security tab.
-      security-events: write
     steps:
       - uses: actions/checkout@v4
       # Filesystem scan: known CVEs in both ecosystems' lockfiles (a second
       # opinion alongside pnpm audit/pip-audit, from a different advisory
       # database) plus Dockerfile/IaC misconfigurations (e.g. a container
-      # that would run as root). Non-blocking by design — see the report
-      # step below — findings land in the Security tab rather than failing
-      # the build outright, since a newly-disclosed upstream CVE with no
-      # fix available yet shouldn't block every unrelated PR.
+      # that would run as root). Non-blocking by design (exit-code: 0) — a
+      # newly-disclosed upstream CVE with no fix available yet shouldn't
+      # fail every unrelated PR; results print as a table in this step's
+      # log instead. (Not uploaded as SARIF to the repo's Security tab:
+      # that needs a `security-events: write` grant, which this repo's
+      # default workflow permissions don't allow yet without a one-time
+      # Settings → Actions → General change — see
+      # docs/deployment/ci-cd.md's known gaps.)
       - name: Trivy filesystem scan
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: fs
           scan-ref: .
           severity: HIGH,CRITICAL
-          format: sarif
-          output: trivy-results.sarif
+          format: table
           exit-code: 0
-      - name: Upload results to the Security tab
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: trivy-results.sarif

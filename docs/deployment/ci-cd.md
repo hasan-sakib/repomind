@@ -56,7 +56,7 @@ Also runs on a **weekly schedule** (Mondays 06:00 UTC) and via
 | `dependency-audit-frontend` | `pnpm audit --audit-level=high` | Yes — fails on high/critical advisories |
 | `dependency-audit-backend` | `pip-audit` (via `uv run --with pip-audit`, against the actually-installed venv) | Yes — fails on any known advisory |
 | `secret-scan` | `gitleaks` (official Docker image, run directly — not the marketplace action, to avoid depending on that action's own licensing terms), scanning full git history, not just the current commit | Yes |
-| `vulnerability-scan` | `aquasecurity/trivy-action` filesystem scan (both lockfiles, for a second advisory-database opinion, plus Dockerfile/IaC misconfiguration checks) | **No** — findings are uploaded as SARIF to the repo's **Security** tab instead of failing the build. A newly-disclosed upstream CVE with no fix yet shouldn't block every unrelated PR; it should be visible and triaged instead. |
+| `vulnerability-scan` | `aquasecurity/trivy-action` filesystem scan (both lockfiles, for a second advisory-database opinion, plus Dockerfile/IaC misconfiguration checks) | **No** (`exit-code: 0`) — a newly-disclosed upstream CVE with no fix yet shouldn't fail every unrelated PR. Results print as a table in the step's own log; see the known-gaps note below on why this isn't a Security-tab SARIF upload. |
 
 `.gitleaks.toml` (repo root) allowlists the two fixed, clearly-fake test/CI
 secrets (`tests/conftest.py`'s dummy `JWT_SECRET`, `backend-ci.yml`'s own
@@ -189,3 +189,13 @@ protection rules**:
   it's accepted (blast radius, exploitability given this app's actual
   usage) rather than silencing the tool wholesale — an unexplained
   ignore-list entry is worse than a red check.
+- Trivy's results aren't uploaded to the repo's **Security** tab as SARIF
+  — that needs the job to request `security-events: write`, which this
+  repo's current default workflow permissions (Settings → Actions →
+  General → Workflow permissions) don't grant, and a job that asks for
+  more than the repo allows fails at "Set up job" before any step even
+  runs. Fix by switching that setting to "Read and write permissions" (or
+  narrowly allowing `security-events`), then restore the
+  `permissions: security-events: write` block and swap the Trivy step's
+  `format: table` back to `format: sarif` + an
+  `github/codeql-action/upload-sarif` step.

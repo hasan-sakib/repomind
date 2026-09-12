@@ -29,7 +29,13 @@ jobs:
         working-directory: backend
     services:
       postgres:
-        image: postgres:16-alpine
+        # Must be the pgvector-enabled image, not plain postgres — the
+        # test suite creates CodeEmbedding.embedding (a pgvector `vector`
+        # column via Base.metadata.create_all, not an Alembic migration),
+        # which fails outright against a Postgres build that doesn't have
+        # the extension's shared library at all. Matches
+        # docker-compose.yml's own postgres image exactly.
+        image: pgvector/pgvector:pg16
         env:
           POSTGRES_USER: repomind
           POSTGRES_PASSWORD: repomind
@@ -70,6 +76,15 @@ jobs:
       JWT_SECRET: ci-test-secret-at-least-32-bytes-long-for-hs256
     steps:
       - uses: actions/checkout@v4
+
+      # Belt-and-suspenders alongside the pgvector/pgvector image itself:
+      # explicitly ensure the extension is enabled in the actual test
+      # database rather than assuming the image's own init scripts always
+      # create it in every database a job happens to use.
+      - name: Enable pgvector extension
+        run: |
+          PGPASSWORD=repomind psql -h localhost -U repomind -d repomind_test \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
       # enable-cache caches uv's package cache (keyed on uv.lock) across
       # runs — `uv sync` still resolves/links every time, but skips
