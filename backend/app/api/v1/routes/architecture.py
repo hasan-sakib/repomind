@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import DbSession, require_repository_access
-from app.domain.repository import Repository
+from app.models.repository import Repository
 from app.schemas.architecture import (
     FileDetailPublic,
     GraphViewPublic,

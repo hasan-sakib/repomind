@@ -6,11 +6,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.chat_status import RetrievalSourceType
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.chat_status import RetrievalSourceType
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
 
 if TYPE_CHECKING:
-    from app.domain.ai_run import AiRun
+    from app.models.ai_run import AiRun
 
 
 class RetrievalResult(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):

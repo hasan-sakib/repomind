@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from app.analytics.issues import bucket_daily_issue_counts, summarize_open_issues
-from app.domain.issue import Issue
+from app.models.issue import Issue
 
 
 def _issue(

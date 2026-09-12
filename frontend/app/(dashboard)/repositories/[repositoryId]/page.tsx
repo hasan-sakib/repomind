@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/error-state";
-import { RepositoryStatusBadge } from "@/components/repositories/status-badge";
+import { RepositoryStatusBadge } from "@/components/repository/status-badge";
 import { getRepositoryOverview, syncRepositoryNow } from "@/lib/api/repositories";
 import { formatRelativeTime } from "@/lib/format-time";
 import { useRealtime } from "@/lib/realtime-context";

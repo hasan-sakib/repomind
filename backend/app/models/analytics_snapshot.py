@@ -7,8 +7,8 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.domain.analytics_status import AnalyticsSnapshotStatus
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.analytics_status import AnalyticsSnapshotStatus
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
 
 
 class DailyCommitRecord(TypedDict):

@@ -45,11 +45,11 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlalchemy.pool import NullPool
 
+from app import models  # noqa: F401  (populates Base.metadata)
 from app.api.deps import get_arq_pool
 from app.core.config import get_settings
 from app.db.base import Base
 from app.db.session import get_db_session
-from app.domain import models  # noqa: F401  (populates Base.metadata)
 from app.main import app
 from app.workers import tasks as worker_tasks
 

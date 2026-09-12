@@ -36,11 +36,11 @@ from app.ai.provider import AIProvider, ChatMessage
 from app.ai.reranker import Reranker
 from app.core.config import Settings
 from app.db.session import async_session_factory
-from app.domain.ai_run import AiRun
-from app.domain.chat_status import MessageFeedback, MessageRole
-from app.domain.conversation import Conversation
-from app.domain.message import Message
-from app.domain.repository import Repository
+from app.models.ai_run import AiRun
+from app.models.chat_status import MessageFeedback, MessageRole
+from app.models.conversation import Conversation
+from app.models.message import Message
+from app.models.repository import Repository
 from app.repositories import (
     ai_run_repository,
     commit_repository,

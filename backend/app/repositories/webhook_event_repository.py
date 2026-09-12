@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.webhook_event import WebhookEvent
+from app.models.webhook_event import WebhookEvent
 
 
 async def get_by_delivery_id(db: AsyncSession, github_delivery_id: str) -> WebhookEvent | None:

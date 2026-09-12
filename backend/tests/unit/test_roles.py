@@ -1,4 +1,4 @@
-from app.domain.role import Role, role_at_least
+from app.models.role import Role, role_at_least
 
 
 def test_owner_meets_every_minimum() -> None:

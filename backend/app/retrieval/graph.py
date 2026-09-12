@@ -23,7 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.ai.embedding_provider import EmbeddingProvider
 from app.ai.reranker import Reranker
 from app.core.config import Settings
-from app.domain.chat_status import QueryIntent
+from app.models.chat_status import QueryIntent
 from app.retrieval import dependency_graph, git_history, intent, ranking, vector_search
 from app.retrieval.types import RetrievedChunk
 

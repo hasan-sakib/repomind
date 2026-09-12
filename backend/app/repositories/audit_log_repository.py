@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.audit_log import AuditLog
+from app.models.audit_log import AuditLog
 
 
 def create(

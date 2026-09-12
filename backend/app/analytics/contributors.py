@@ -4,8 +4,8 @@ contributor filter."""
 
 from collections import defaultdict
 
-from app.domain.analytics_snapshot import ContributorActivityRecord, DailyCommitRecord
-from app.domain.pull_request import PullRequest
+from app.models.analytics_snapshot import ContributorActivityRecord, DailyCommitRecord
+from app.models.pull_request import PullRequest
 
 
 def build_contributor_activity(

@@ -2,8 +2,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.chat_status import RetrievalSourceType
-from app.domain.retrieval_result import RetrievalResult
+from app.models.chat_status import RetrievalSourceType
+from app.models.retrieval_result import RetrievalResult
 
 
 def create(

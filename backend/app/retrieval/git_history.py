@@ -1,5 +1,5 @@
 """Git history as a retrieval source — keyword search over synced commit
-messages (app/domain/commit.py). Commits are synced as a bounded recent
+messages (app/models/commit.py). Commits are synced as a bounded recent
 window with no per-commit changed-file list (see ADR 0003), so this
 cannot answer "which commits touched file X" — only "which recent commits
 mention topic X", surfaced as supplementary context/citations for HISTORY-
@@ -14,8 +14,8 @@ import uuid
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.chat_status import RetrievalSourceType
-from app.domain.commit import Commit
+from app.models.chat_status import RetrievalSourceType
+from app.models.commit import Commit
 from app.retrieval.types import RetrievedChunk
 
 _WORD = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,}")

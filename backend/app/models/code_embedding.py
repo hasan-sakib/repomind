@@ -7,10 +7,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import UUIDPrimaryKeyMixin
+from app.models.mixins import UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.domain.code_chunk import CodeChunk
+    from app.models.code_chunk import CodeChunk
 
 # Must match Settings.embedding_dimension (app/core/config.py) and the
 # hand-written HNSW index in the Alembic migration. Changing this requires a

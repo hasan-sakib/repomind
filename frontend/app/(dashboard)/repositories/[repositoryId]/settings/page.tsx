@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/error-state";
-import { RepositoryStatusBadge } from "@/components/repositories/status-badge";
+import { RepositoryStatusBadge } from "@/components/repository/status-badge";
 import { disconnectRepository, getRepositoryOverview } from "@/lib/api/repositories";
 import { useCurrentOrg } from "@/lib/current-org";
 

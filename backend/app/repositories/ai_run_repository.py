@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.ai_run import AiRun
-from app.domain.chat_status import AiRunStatus, QueryIntent
+from app.models.ai_run import AiRun
+from app.models.chat_status import AiRunStatus, QueryIntent
 
 
 async def get(db: AsyncSession, run_id: uuid.UUID) -> AiRun | None:

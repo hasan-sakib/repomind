@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.commit import Commit
+from app.models.commit import Commit
 
 
 async def list_recent(

@@ -7,11 +7,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.chat_status import AiRunStatus, QueryIntent
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.chat_status import AiRunStatus, QueryIntent
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
 
 if TYPE_CHECKING:
-    from app.domain.retrieval_result import RetrievalResult
+    from app.models.retrieval_result import RetrievalResult
 
 
 class AiRun(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):

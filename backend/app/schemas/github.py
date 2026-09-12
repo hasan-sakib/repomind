@@ -3,14 +3,14 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.domain.branch import Branch
-from app.domain.commit import Commit
-from app.domain.github_installation import GitHubInstallation
-from app.domain.issue import Issue
-from app.domain.pull_request import PullRequest
-from app.domain.repository import Repository
-from app.domain.repository_status import RepositoryStatus
 from app.integrations.github.schemas import GitHubRepo
+from app.models.branch import Branch
+from app.models.commit import Commit
+from app.models.github_installation import GitHubInstallation
+from app.models.issue import Issue
+from app.models.pull_request import PullRequest
+from app.models.repository import Repository
+from app.models.repository_status import RepositoryStatus
 
 
 class InstallationPublic(BaseModel):

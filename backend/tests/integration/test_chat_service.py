@@ -11,7 +11,7 @@ from app.ai.provider import AIProvider, ChatMessage, CompletionResult
 from app.ai.reranker import RerankedDocument, Reranker
 from app.core.config import get_settings
 from app.db.session import async_session_factory
-from app.domain.chat_status import AiRunStatus, MessageFeedback, MessageRole, QueryIntent
+from app.models.chat_status import AiRunStatus, MessageFeedback, MessageRole, QueryIntent
 from app.repositories import (
     ai_run_repository,
     code_chunk_repository,

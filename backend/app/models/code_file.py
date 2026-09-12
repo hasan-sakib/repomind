@@ -7,12 +7,12 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import UUIDPrimaryKeyMixin
+from app.models.mixins import UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.domain.code_chunk import CodeChunk
-    from app.domain.code_symbol import CodeSymbol
-    from app.domain.repository import Repository
+    from app.models.code_chunk import CodeChunk
+    from app.models.code_symbol import CodeSymbol
+    from app.models.repository import Repository
 
 
 class ImportRecord(TypedDict):

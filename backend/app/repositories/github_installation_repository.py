@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.github_installation import GitHubInstallation
+from app.models.github_installation import GitHubInstallation
 
 
 async def get_by_github_installation_id(

@@ -7,8 +7,8 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
-from app.domain.onboarding_status import OnboardingGuideStatus
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.onboarding_status import OnboardingGuideStatus
 
 
 class ImportantModuleRecord(TypedDict):

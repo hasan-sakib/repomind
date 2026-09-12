@@ -25,12 +25,12 @@ from app.analytics import pull_requests as pr_analytics
 from app.architecture.graph_builder import rank_files_by_dependents
 from app.core.config import Settings, get_settings
 from app.db.session import async_session_factory
-from app.domain.analytics_snapshot import AnalyticsSnapshot, DailyPRIssueRecord
-from app.domain.repository import Repository
 from app.events.publish import publish_notification, publish_state
 from app.events.types import EventCategory
 from app.integrations.github import app_client, rest_client
 from app.integrations.github.schemas import GitHubPullRequestFile
+from app.models.analytics_snapshot import AnalyticsSnapshot, DailyPRIssueRecord
+from app.models.repository import Repository
 from app.repositories import (
     analytics_snapshot_repository,
     github_installation_repository,

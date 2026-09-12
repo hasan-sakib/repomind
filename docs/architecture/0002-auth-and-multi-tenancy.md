@@ -165,7 +165,7 @@ a full page reload).
 
 ## Testing
 
-39 backend tests (`apps/api/tests/`): unit tests for password hashing, JWT
+39 backend tests (`backend/tests/`): unit tests for password hashing, JWT
 tokens, and role ordering; integration tests (real Postgres, real HTTP
 requests via `httpx.AsyncClient` against the actual FastAPI app) covering
 registration, login, logout, refresh rotation and theft-detection,

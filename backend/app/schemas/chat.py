@@ -4,10 +4,10 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.domain.chat_status import MessageFeedback, MessageRole, QueryIntent, RetrievalSourceType
-from app.domain.conversation import Conversation
-from app.domain.message import Message
-from app.domain.retrieval_result import RetrievalResult
+from app.models.chat_status import MessageFeedback, MessageRole, QueryIntent, RetrievalSourceType
+from app.models.conversation import Conversation
+from app.models.message import Message
+from app.models.retrieval_result import RetrievalResult
 
 
 class SourceReferencePublic(BaseModel):

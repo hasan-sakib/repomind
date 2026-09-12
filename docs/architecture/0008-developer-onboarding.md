@@ -12,7 +12,7 @@
     `pyproject.toml` — PEP 621 and Poetry — `requirements.txt`, `go.mod`).
   - `setup.py` — presence-based development-setup step detection
     (`find_shallowest` handles monorepo-nested manifests, e.g. this
-    project's own `apps/api/pyproject.toml`).
+    project's own `backend/pyproject.toml`).
   - `heuristics.py` — entry-point/README/auth-file detection and the
     fixed-category learning-path builder.
   - `context.py` — aggregates all of the above plus

@@ -11,11 +11,11 @@ from app.api.deps import (
     require_organization_role,
     require_repository_access,
 )
-from app.domain.indexing_status import IndexingTrigger
-from app.domain.organization_member import OrganizationMember
-from app.domain.repository import Repository
-from app.domain.role import Role, role_at_least
-from app.domain.user import User
+from app.models.indexing_status import IndexingTrigger
+from app.models.organization_member import OrganizationMember
+from app.models.repository import Repository
+from app.models.role import Role, role_at_least
+from app.models.user import User
 from app.repositories import (
     branch_repository,
     commit_repository,

@@ -3,10 +3,10 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.slugify import slugify
-from app.domain.organization import Organization
-from app.domain.organization_member import OrganizationMember
-from app.domain.role import Role, role_at_least
-from app.domain.user import User
+from app.models.organization import Organization
+from app.models.organization_member import OrganizationMember
+from app.models.role import Role, role_at_least
+from app.models.user import User
 from app.repositories import (
     audit_log_repository,
     organization_member_repository,
@@ -121,7 +121,7 @@ async def add_member(
 
     # New members automatically get visibility into every repository
     # already connected to this organization — see
-    # app/domain/repository_membership.py for why this is auto-maintained
+    # app/models/repository_membership.py for why this is auto-maintained
     # rather than manually managed in this phase.
     for repository in await repository_repository.list_for_organization(db, organization_id):
         repository_membership_repository.create(

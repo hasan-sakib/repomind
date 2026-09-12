@@ -8,8 +8,8 @@ metric this phase measures under the "PR review latency" heading."""
 import statistics
 from collections import defaultdict
 
-from app.domain.analytics_snapshot import PRCycleTimeSampleRecord
-from app.domain.pull_request import PullRequest
+from app.models.analytics_snapshot import PRCycleTimeSampleRecord
+from app.models.pull_request import PullRequest
 
 
 def bucket_daily_pr_counts(pull_requests: list[PullRequest]) -> dict[str, dict[str, int]]:

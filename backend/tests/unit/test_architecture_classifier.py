@@ -16,7 +16,7 @@ def test_classifies_repository_files() -> None:
 
 
 def test_classifies_model_files() -> None:
-    assert classify_path("app/domain/user.py") == "model"
+    assert classify_path("app/models/user.py") == "model"
     assert classify_path("app/models/product.py") == "model"
 
 

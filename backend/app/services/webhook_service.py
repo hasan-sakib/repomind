@@ -6,10 +6,10 @@ from typing import Any
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.repository import Repository
 from app.events.publish import publish_notification, publish_state
 from app.events.types import EventCategory
 from app.integrations.github.schemas import GitHubIssue, GitHubPullRequest
+from app.models.repository import Repository
 from app.repositories import (
     github_installation_repository,
     issue_repository,
@@ -69,7 +69,7 @@ async def process_webhook(
 ) -> WebhookResult:
     """Idempotent: a redelivered `github_delivery_id` is detected via the
     unique constraint on webhook_events and skipped without reprocessing —
-    see app/domain/webhook_event.py."""
+    see app/models/webhook_event.py."""
     existing = await webhook_event_repository.get_by_delivery_id(db, github_delivery_id)
     if existing is not None:
         return WebhookResult(duplicate=True)

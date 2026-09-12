@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { EmptyState } from "@/components/empty-state";
 import { ErrorState } from "@/components/error-state";
-import { RepositoryStatusBadge } from "@/components/repositories/status-badge";
+import { RepositoryStatusBadge } from "@/components/repository/status-badge";
 import { listRepositories } from "@/lib/api/repositories";
 import { useCurrentOrg } from "@/lib/current-org";
 import { formatRelativeTime } from "@/lib/format-time";

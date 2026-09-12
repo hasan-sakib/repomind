@@ -9,8 +9,8 @@ from app.api.deps import (
     require_csrf_header,
     require_repository_access,
 )
-from app.domain.repository import Repository
-from app.domain.user import User
+from app.models.repository import Repository
+from app.models.user import User
 from app.schemas.onboarding import OnboardingGuidePublic, SetProgressRequest
 from app.services import onboarding_service
 

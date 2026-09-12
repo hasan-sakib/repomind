@@ -8,7 +8,7 @@ from pytest_httpx import HTTPXMock
 
 from app.ai.provider import AIProvider, ChatMessage, CompletionResult
 from app.db.session import async_session_factory
-from app.domain.pr_analysis_status import PRAnalysisStatus
+from app.models.pr_analysis_status import PRAnalysisStatus
 from app.repositories import pull_request_analysis_repository, pull_request_repository
 from app.services import pr_analysis_service
 from tests.integration.test_repository_connect import (

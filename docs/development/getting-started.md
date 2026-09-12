@@ -13,11 +13,11 @@
 pnpm install
 
 # Backend: install Python dependencies
-cd apps/api && uv sync && cd ../..
+cd backend && uv sync && cd ..
 
 # Copy env files and fill in secrets
-cp apps/api/.env.example apps/api/.env
-cp apps/web/.env.example apps/web/.env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 
 # Start local Postgres
 docker compose up -d postgres
@@ -31,11 +31,11 @@ docker exec repomind-postgres-1 createdb -U repomind repomind_test
 ## Running the apps
 
 ```bash
-# Backend (from apps/api)
+# Backend (from backend)
 uv run alembic upgrade head
 uv run uvicorn app.main:app --reload --port 8000
 
-# Frontend (from apps/web, or `pnpm dev` from the repo root via Turborepo)
+# Frontend (from frontend, or `pnpm dev` from the repo root via Turborepo)
 pnpm dev
 ```
 
@@ -46,10 +46,10 @@ pnpm dev
 
 ```bash
 # Frontend
-pnpm lint && pnpm exec tsc --noEmit && pnpm build   # from apps/web
+pnpm lint && pnpm exec tsc --noEmit && pnpm build   # from frontend
 
 # Backend
-uv run ruff check . && uv run mypy app && uv run pytest -q   # from apps/api
+uv run ruff check . && uv run mypy app && uv run pytest -q   # from backend
 ```
 
 CI (`.github/workflows/ci.yml`) runs all of the above on every push and PR.

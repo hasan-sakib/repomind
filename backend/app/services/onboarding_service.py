@@ -16,7 +16,10 @@ from sqlalchemy.orm import selectinload
 from app.ai.provider import AIProvider, ChatMessage
 from app.core.config import Settings, get_settings
 from app.db.session import async_session_factory
-from app.domain.onboarding_guide import (
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
+from app.integrations.github import app_client
+from app.models.onboarding_guide import (
     DatabaseStructureEntryRecord,
     DependencyRecord,
     FaqEntryRecord,
@@ -26,10 +29,7 @@ from app.domain.onboarding_guide import (
     RecommendedFileRecord,
     SetupStepRecord,
 )
-from app.domain.repository import Repository
-from app.events.publish import publish_notification, publish_state
-from app.events.types import EventCategory
-from app.integrations.github import app_client
+from app.models.repository import Repository
 from app.onboarding import prompt as onboarding_prompt
 from app.onboarding.context import OnboardingContext, build_context
 from app.onboarding.result_schema import (

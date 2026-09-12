@@ -8,7 +8,7 @@ from pytest_httpx import HTTPXMock
 
 from app.ai.provider import AIProvider, ChatMessage, CompletionResult
 from app.db.session import async_session_factory
-from app.domain.indexing_status import IndexingJobStatus, IndexingTrigger
+from app.models.indexing_status import IndexingJobStatus, IndexingTrigger
 from app.repositories import indexing_job_repository
 from app.workers import tasks as worker_tasks
 from tests.integration.test_repository_connect import (

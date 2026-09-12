@@ -2,9 +2,9 @@
 
 from arq.connections import RedisSettings
 
+from app import models  # noqa: F401 — registers every mapped class before first use.
 from app.core.config import get_settings
 from app.core.logging import configure_logging
-from app.domain import models  # noqa: F401 — registers every mapped class before first use.
 from app.workers.tasks import (
     analyze_pull_request,
     generate_analytics_snapshot,

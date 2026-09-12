@@ -20,9 +20,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.architecture.classifier import NodeKind, classify_path
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
 from app.integrations.github.schemas import GitHubPullRequestFile
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
 from app.pr_analysis.diff_parser import parse_patch_added_lines
 from app.retrieval.dependency_graph import find_dependents
 

@@ -2,9 +2,9 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.repository import Repository
-from app.domain.repository_status import RepositoryStatus
 from app.integrations.github import app_client, rest_client
+from app.models.repository import Repository
+from app.models.repository_status import RepositoryStatus
 from app.repositories import (
     audit_log_repository,
     github_installation_repository,

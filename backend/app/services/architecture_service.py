@@ -4,9 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.architecture import graph_builder
 from app.architecture.types import FileDetail, GraphView, SearchResult
-from app.domain.repository import Repository
 from app.integrations.github import app_client, rest_client
 from app.integrations.github.schemas import GitHubCommit
+from app.models.repository import Repository
 from app.repositories import github_installation_repository
 from app.services.exceptions import ArchitectureFileNotFoundError, ArchitecturePackageNotFoundError
 

@@ -69,24 +69,24 @@ for real-time infrastructure.
 
 ## Stack
 
-| Layer      | Choice                                                             |
-| ---------- | ------------------------------------------------------------------- |
-| Frontend   | Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui       |
-| Backend    | FastAPI, Pydantic v2, SQLAlchemy (async), Alembic                 |
-| Database   | PostgreSQL + pgvector                                              |
-| Indexing   | tree-sitter (AST parsing/chunking), Voyage AI (`voyage-code-3`)   |
-| Jobs       | arq + Redis                                                       |
-| Real-time  | WebSockets + Redis pub/sub (one event bus, one channel per organization) |
+| Layer      | Choice                                                                                                                                              |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend   | Next.js (App Router), TypeScript, Tailwind CSS v4, shadcn/ui                                                                                        |
+| Backend    | FastAPI, Pydantic v2, SQLAlchemy (async), Alembic                                                                                                   |
+| Database   | PostgreSQL + pgvector                                                                                                                               |
+| Indexing   | tree-sitter (AST parsing/chunking), Voyage AI (`voyage-code-3`)                                                                                     |
+| Jobs       | arq + Redis                                                                                                                                         |
+| Real-time  | WebSockets + Redis pub/sub (one event bus, one channel per organization)                                                                            |
 | AI         | Anthropic Claude or a free local Ollama model (Qwen/Llama/Gemma) for chat, Voyage AI (embeddings, reranking), LangGraph for retrieval orchestration |
-| Graph viz  | `@xyflow/react` (React Flow) + `@dagrejs/dagre` for layout        |
-| Charting   | `recharts`                                                         |
-| Deployment | Vercel (web), Railway/Fly.io (API + database)                     |
+| Graph viz  | `@xyflow/react` (React Flow) + `@dagrejs/dagre` for layout                                                                                          |
+| Charting   | `recharts`                                                                                                                                          |
+| Deployment | Vercel (web), Railway/Fly.io (API + database)                                                                                                       |
 
 ## Repository layout
 
 ```
-apps/web     Next.js frontend
-apps/api     FastAPI backend
+frontend/    Next.js frontend
+backend/     FastAPI backend
 packages/    Shared code across apps (as needed)
 docs/        Architecture, API, database, deployment, development, product docs
 ```

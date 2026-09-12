@@ -8,14 +8,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.embedding_provider import EmbeddingProvider, EmbeddingResult
 from app.db.session import async_session_factory
-from app.domain.code_chunk import CodeChunk
-from app.domain.code_embedding import CodeEmbedding
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
-from app.domain.indexing_job import IndexingJob
-from app.domain.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
-from app.domain.repository import Repository
 from app.indexing import pipeline as pipeline_module
+from app.models.code_chunk import CodeChunk
+from app.models.code_embedding import CodeEmbedding
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
+from app.models.indexing_job import IndexingJob
+from app.models.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
+from app.models.repository import Repository
 from app.repositories import (
     branch_repository,
     github_installation_repository,

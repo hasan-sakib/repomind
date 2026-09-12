@@ -3,9 +3,9 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from app.domain.organization import Organization
-from app.domain.organization_member import OrganizationMember
-from app.domain.role import Role
+from app.models.organization import Organization
+from app.models.organization_member import OrganizationMember
+from app.models.role import Role
 from app.schemas.user import UserPublic
 
 

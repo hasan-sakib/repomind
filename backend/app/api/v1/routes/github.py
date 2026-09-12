@@ -7,8 +7,8 @@ from fastapi.responses import RedirectResponse
 
 from app.api.deps import DbSession, require_organization_role
 from app.core.config import get_settings
-from app.domain.organization_member import OrganizationMember
-from app.domain.role import Role
+from app.models.organization_member import OrganizationMember
+from app.models.role import Role
 from app.repositories import github_installation_repository
 from app.schemas.github import AvailableRepositoryPublic, InstallationPublic
 from app.services import github_service

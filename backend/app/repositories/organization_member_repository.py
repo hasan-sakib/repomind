@@ -4,8 +4,8 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.organization_member import OrganizationMember
-from app.domain.role import Role
+from app.models.organization_member import OrganizationMember
+from app.models.role import Role
 
 
 async def get(

@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.indexing_job import IndexingJob
-from app.domain.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
+from app.models.indexing_job import IndexingJob
+from app.models.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
 
 _ACTIVE_STATUSES = (IndexingJobStatus.QUEUED, IndexingJobStatus.RUNNING)
 _SUCCEEDED_STATUSES = (IndexingJobStatus.SUCCEEDED, IndexingJobStatus.PARTIAL)

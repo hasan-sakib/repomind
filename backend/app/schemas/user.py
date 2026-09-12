@@ -3,7 +3,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from app.domain.user import User
+from app.models.user import User
 
 
 class UserPublic(BaseModel):

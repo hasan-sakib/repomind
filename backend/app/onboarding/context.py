@@ -12,9 +12,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.architecture import graph_builder
 from app.architecture.types import FileRanking
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
 from app.integrations.github import rest_client
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
 from app.onboarding import heuristics
 from app.onboarding.heuristics import DatabaseStructureEntry, LearningPathStep
 from app.onboarding.manifest import MANIFEST_FILENAMES, Dependency, parse_manifest

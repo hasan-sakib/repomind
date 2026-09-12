@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.code_symbol import CodeSymbol
+from app.models.code_symbol import CodeSymbol
 
 
 def create(

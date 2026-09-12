@@ -20,15 +20,15 @@ from sqlalchemy.orm import selectinload
 
 from app.ai.embedding_provider import EmbeddingProvider
 from app.core.config import Settings, get_settings
-from app.domain.code_file import ImportRecord
-from app.domain.indexing_job import IndexingJob
-from app.domain.indexing_status import IndexingJobStatus, IndexingStage
-from app.domain.repository import Repository
 from app.events.publish import publish_notification, publish_state
 from app.events.types import EventCategory
 from app.indexing import chunker, discovery
 from app.indexing.parser import parse_source
 from app.integrations.git.fetcher import clone_repository
+from app.models.code_file import ImportRecord
+from app.models.indexing_job import IndexingJob
+from app.models.indexing_status import IndexingJobStatus, IndexingStage
+from app.models.repository import Repository
 from app.repositories import (
     code_chunk_repository,
     code_embedding_repository,

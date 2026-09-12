@@ -51,7 +51,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.ruff.lint.per-file-ignores]
 # Alembic autogenerate produces long lines it doesn't format for us — never
 # hand-edit these for style, only for correctness.
-"app/db/migrations/versions/*.py" = ["E501"]
+"alembic/versions/*.py" = ["E501"]
 # Settings must be populated (env vars, a generated test RSA key) before
 # importing app modules that read them at import time via get_settings().
 "tests/conftest.py" = ["E402"]

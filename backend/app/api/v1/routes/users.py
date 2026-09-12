@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from app.api.deps import DbSession, get_current_user, require_csrf_header
-from app.domain.user import User
+from app.models.user import User
 from app.schemas.user import UserPublic, UserUpdateRequest
 
 router = APIRouter(prefix="/users", tags=["users"])

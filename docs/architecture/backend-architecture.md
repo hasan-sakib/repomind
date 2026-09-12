@@ -16,7 +16,7 @@
 > `docs/architecture/0004-codebase-indexing.md`.
 
 **Status:** Design (Phase 1) — targets implementation in Phase 2
-**Scope:** `apps/api` internal structure, auth model, GitHub App integration
+**Scope:** `backend` internal structure, auth model, GitHub App integration
 **Companion docs:** `docs/api/api-design.md` (REST surface), `docs/database/README.md`
 (schema, to be written alongside the first Alembic migration), `docs/ai/`
 (retrieval pipeline and embedding generation — out of scope here)

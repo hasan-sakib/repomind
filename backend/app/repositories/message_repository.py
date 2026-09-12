@@ -3,8 +3,8 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.chat_status import MessageFeedback, MessageRole
-from app.domain.message import Message
+from app.models.chat_status import MessageFeedback, MessageRole
+from app.models.message import Message
 
 
 async def get(db: AsyncSession, message_id: uuid.UUID) -> Message | None:

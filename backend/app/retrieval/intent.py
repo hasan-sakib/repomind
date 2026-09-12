@@ -9,7 +9,7 @@ graph.py only depends on this module's two function signatures.
 
 import re
 
-from app.domain.chat_status import QueryIntent
+from app.models.chat_status import QueryIntent
 
 _DEPENDENCY_PATTERNS = (
     r"\bdepend(s|ency|encies)?\b",

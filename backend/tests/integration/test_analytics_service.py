@@ -7,7 +7,7 @@ from httpx import AsyncClient
 from pytest_httpx import HTTPXMock
 
 from app.db.session import async_session_factory
-from app.domain.analytics_status import AnalyticsSnapshotStatus
+from app.models.analytics_status import AnalyticsSnapshotStatus
 from app.repositories import analytics_snapshot_repository, repository_repository
 from app.services import analytics_service
 from app.services.exceptions import RepositoryNotSyncedError

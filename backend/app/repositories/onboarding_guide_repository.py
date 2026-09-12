@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.onboarding_guide import (
+from app.models.onboarding_guide import (
     DatabaseStructureEntryRecord,
     DependencyRecord,
     FaqEntryRecord,
@@ -14,7 +14,7 @@ from app.domain.onboarding_guide import (
     RecommendedFileRecord,
     SetupStepRecord,
 )
-from app.domain.onboarding_status import OnboardingGuideStatus
+from app.models.onboarding_status import OnboardingGuideStatus
 
 _ACTIVE_STATUSES = (OnboardingGuideStatus.QUEUED, OnboardingGuideStatus.RUNNING)
 

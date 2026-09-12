@@ -7,8 +7,8 @@ from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
-from app.domain.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
 
 
 class AffectedComponentRecord(TypedDict):

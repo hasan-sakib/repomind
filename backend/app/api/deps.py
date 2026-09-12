@@ -13,11 +13,11 @@ from app.ai.provider import AIProvider
 from app.ai.reranker import Reranker
 from app.core.security.tokens import InvalidTokenError, decode_access_token
 from app.db.session import get_db_session
-from app.domain.organization_member import OrganizationMember
-from app.domain.repository import Repository
-from app.domain.role import Role
-from app.domain.session import Session
-from app.domain.user import User
+from app.models.organization_member import OrganizationMember
+from app.models.repository import Repository
+from app.models.role import Role
+from app.models.session import Session
+from app.models.user import User
 from app.repositories import session_repository, user_repository
 from app.services import organization_service, repository_service
 from app.services.exceptions import CsrfError, NotAuthenticatedError

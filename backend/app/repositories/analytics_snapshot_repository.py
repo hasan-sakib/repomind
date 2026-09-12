@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.analytics_snapshot import (
+from app.models.analytics_snapshot import (
     AnalyticsSnapshot,
     ArchitectureHotspotRecord,
     ContributorActivityRecord,
@@ -14,7 +14,7 @@ from app.domain.analytics_snapshot import (
     PRCycleTimeSampleRecord,
     StaleIssueRecord,
 )
-from app.domain.analytics_status import AnalyticsSnapshotStatus
+from app.models.analytics_status import AnalyticsSnapshotStatus
 
 _ACTIVE_STATUSES = (AnalyticsSnapshotStatus.QUEUED, AnalyticsSnapshotStatus.RUNNING)
 

@@ -3,5 +3,5 @@ node_modules
 .turbo
 dist
 build
-apps/api
+backend
 pnpm-lock.yaml

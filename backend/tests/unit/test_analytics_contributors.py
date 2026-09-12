@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from app.analytics.contributors import build_contributor_activity
-from app.domain.pull_request import PullRequest
+from app.models.pull_request import PullRequest
 
 
 def _daily_commit(login: str | None, name: str | None, count: int, date: str = "2026-01-01"):

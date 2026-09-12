@@ -12,9 +12,9 @@ from app.api.deps import (
 )
 from app.api.v1.cookie_utils import clear_session_cookies, set_session_cookies
 from app.core.config import get_settings
-from app.domain.session import Session
-from app.domain.user import User
 from app.integrations.github import oauth as github_oauth
+from app.models.session import Session
+from app.models.user import User
 from app.schemas.auth import (
     AuthResponse,
     EmailVerificationConfirmRequest,

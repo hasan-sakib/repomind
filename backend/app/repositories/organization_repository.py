@@ -3,7 +3,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.organization import Organization
+from app.models.organization import Organization
 
 
 async def get_by_id(db: AsyncSession, organization_id: uuid.UUID) -> Organization | None:

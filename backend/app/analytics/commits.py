@@ -4,8 +4,8 @@ commit-frequency and contributor-activity views."""
 
 from collections import defaultdict
 
-from app.domain.analytics_snapshot import DailyCommitRecord
 from app.integrations.github.schemas import GitHubCommit
+from app.models.analytics_snapshot import DailyCommitRecord
 
 
 def bucket_daily_commits(commits: list[GitHubCommit]) -> list[DailyCommitRecord]:

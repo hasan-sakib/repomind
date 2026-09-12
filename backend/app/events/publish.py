@@ -2,7 +2,7 @@
 only two shapes any service needs to produce: a state-sync event (fresh
 Public-schema data for a resource) or a notification (a short message for
 toast/notification-center display). Keeps this package free of any
-import on app/domain or app/schemas — callers pass in already-serialized
+import on app/models or app/schemas — callers pass in already-serialized
 data, so the event bus stays a generic transport."""
 
 import uuid

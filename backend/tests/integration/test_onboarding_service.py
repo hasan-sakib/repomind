@@ -8,8 +8,8 @@ from pytest_httpx import HTTPXMock
 
 from app.ai.provider import AIProvider, ChatMessage, CompletionResult
 from app.db.session import async_session_factory
-from app.domain.indexing_status import IndexingJobStatus, IndexingTrigger
-from app.domain.onboarding_status import OnboardingGuideStatus
+from app.models.indexing_status import IndexingJobStatus, IndexingTrigger
+from app.models.onboarding_status import OnboardingGuideStatus
 from app.repositories import (
     indexing_job_repository,
     onboarding_guide_repository,

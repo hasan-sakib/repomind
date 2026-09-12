@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 
 from app.analytics.pull_requests import bucket_daily_pr_counts, compute_cycle_time
-from app.domain.pull_request import PullRequest
+from app.models.pull_request import PullRequest
 
 
 def _pr(

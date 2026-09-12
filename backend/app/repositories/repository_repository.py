@@ -5,8 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.repository import Repository
-from app.domain.repository_status import RepositoryStatus
+from app.models.repository import Repository
+from app.models.repository_status import RepositoryStatus
 
 
 async def get_by_id(db: AsyncSession, repository_id: uuid.UUID) -> Repository | None:

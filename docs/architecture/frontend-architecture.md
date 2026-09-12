@@ -27,7 +27,7 @@
 > component list, and the reasoning behind each divergence.
 
 **Status:** Design (Phase 1) — targets implementation in Phase 2
-**Scope:** `apps/web` routing, auth-aware layout, data-fetching split between
+**Scope:** `frontend` routing, auth-aware layout, data-fetching split between
 server and client components, state management, component organization,
 rendering strategy, and UX conventions (loading/empty/error states,
 accessibility, responsiveness).
@@ -50,7 +50,7 @@ data they need, what state they own), not their markup or styling.
 ## 1. Route structure
 
 ```
-apps/web/src/app/
+frontend/app/
   (auth)/
     login/page.tsx                       Public. "Sign in with GitHub".
   (dashboard)/
@@ -94,7 +94,7 @@ decides which session's history to fetch for the initial render.
 ## 2. `middleware.ts` — UX-layer redirect, not a security boundary
 
 ```ts
-// apps/web/src/middleware.ts (sketch, not final implementation)
+// frontend/middleware.ts (sketch, not final implementation)
 export function middleware(request: NextRequest) {
   const hasSession = request.cookies.has("rm_session");
   const path = request.nextUrl.pathname;

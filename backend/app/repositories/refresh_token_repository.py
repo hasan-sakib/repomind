@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.refresh_token import RefreshToken
+from app.models.refresh_token import RefreshToken
 
 
 async def get_by_token_hash(db: AsyncSession, token_hash: str) -> RefreshToken | None:

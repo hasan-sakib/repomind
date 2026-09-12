@@ -4,8 +4,8 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
-from app.domain.pull_request_analysis import (
+from app.models.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
+from app.models.pull_request_analysis import (
     AffectedComponentRecord,
     ChangedFileRecord,
     PotentialConcernRecord,

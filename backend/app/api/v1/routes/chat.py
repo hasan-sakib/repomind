@@ -15,8 +15,8 @@ from app.api.deps import (
     require_repository_access,
 )
 from app.core.config import get_settings
-from app.domain.repository import Repository
-from app.domain.user import User
+from app.models.repository import Repository
+from app.models.user import User
 from app.schemas.chat import (
     AskRequest,
     ChatStreamEvent,

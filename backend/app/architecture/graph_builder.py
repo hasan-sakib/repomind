@@ -35,8 +35,8 @@ from app.architecture.types import (
     SearchResult,
     SymbolSummary,
 )
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
 
 DATABASE_NODE_ID = "database"
 

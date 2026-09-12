@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.pull_request import PullRequest
+from app.models.pull_request import PullRequest
 
 
 async def list_for_repository(

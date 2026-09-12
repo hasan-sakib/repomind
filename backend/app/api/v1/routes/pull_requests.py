@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 
 from app.api.deps import ArqPool, DbSession, require_csrf_header, require_repository_access
-from app.domain.repository import Repository
+from app.models.repository import Repository
 from app.schemas.github import PullRequestPublic
 from app.schemas.pr_analysis import PullRequestAnalysisPublic
 from app.services import pr_analysis_service

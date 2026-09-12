@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/error-state";
-import { IndexingStatusBadge } from "@/components/repositories/indexing-status-badge";
+import { IndexingStatusBadge } from "@/components/repository/indexing-status-badge";
 import { listIndexingJobs, triggerIndexing } from "@/lib/api/indexing";
 import { getRepositoryOverview } from "@/lib/api/repositories";
 import { formatRelativeTime } from "@/lib/format-time";

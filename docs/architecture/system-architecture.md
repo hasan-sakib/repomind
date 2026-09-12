@@ -55,7 +55,7 @@ provisioning is actually attempted.
 
 ## 2. High-level component responsibilities
 
-**Web (`apps/web`, Next.js App Router on Vercel).** Renders the dashboard,
+**Web (`frontend`, Next.js App Router on Vercel).** Renders the dashboard,
 repository connection flow, ingestion status views, and chat UI. Server
 components fetch initial page data directly from the API; client components
 handle interactive state (chat streaming, ingestion polling) via React
@@ -63,7 +63,7 @@ Query. Holds no secrets and makes no direct calls to GitHub, Anthropic, or
 Voyage — every data access goes through the FastAPI backend over
 `/api/v1`.
 
-**API (`apps/api`, FastAPI on Fly.io).** The single point of contact for
+**API (`backend`, FastAPI on Fly.io).** The single point of contact for
 the frontend and for GitHub webhooks. Owns authentication (issuing and
 validating RepoMind's own session JWTs), request validation, authorization
 (workspace/repository ownership checks), synchronous reads (repository
@@ -232,7 +232,7 @@ over-building:
 
 **Already built (Phase 0, see `docs/architecture/0001-foundation.md`):**
 
-- Monorepo layout (`apps/web`, `apps/api`, `packages/`), pnpm + Turborepo
+- Monorepo layout (`frontend`, `backend`, `packages/`), pnpm + Turborepo
   for the JS side, `uv`-managed Python API as an independent toolchain.
 - FastAPI skeleton: layered `api/v1/routes` → `services` → `repositories` →
   `domain` structure, async SQLAlchemy + Alembic wired (no models yet

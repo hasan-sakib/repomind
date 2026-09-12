@@ -2,8 +2,8 @@ import uuid
 from datetime import UTC, datetime
 
 from app.architecture.types import FileRanking
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
 from app.onboarding import heuristics
 
 
@@ -82,7 +82,7 @@ def test_find_auth_files_returns_empty_when_nothing_matches() -> None:
 
 
 def test_find_database_structure_lists_model_and_repository_classes() -> None:
-    model_file = _file("app/domain/user.py")
+    model_file = _file("app/models/user.py")
     repo_file = _file("app/repositories/user_repository.py")
     route_file = _file("app/api/routes/auth.py")
     user_class = _symbol(model_file.id, "User")
@@ -97,13 +97,13 @@ def test_find_database_structure_lists_model_and_repository_classes() -> None:
         [model_file, repo_file, route_file], symbols_by_file
     )
     assert {(e.path, e.class_name) for e in entries} == {
-        ("app/domain/user.py", "User"),
+        ("app/models/user.py", "User"),
         ("app/repositories/user_repository.py", "UserRepository"),
     }
 
 
 def test_find_database_structure_skips_non_class_symbols() -> None:
-    model_file = _file("app/domain/user.py")
+    model_file = _file("app/models/user.py")
     method_symbol = _symbol(model_file.id, "validate", symbol_type="method")
     entries = heuristics.find_database_structure([model_file], {model_file.id: [method_symbol]})
     assert entries == []

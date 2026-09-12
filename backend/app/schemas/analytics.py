@@ -3,8 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.domain.analytics_snapshot import AnalyticsSnapshot
-from app.domain.analytics_status import AnalyticsSnapshotStatus
+from app.models.analytics_snapshot import AnalyticsSnapshot
+from app.models.analytics_status import AnalyticsSnapshotStatus
 
 
 class DailyCommitPublic(BaseModel):

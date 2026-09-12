@@ -14,14 +14,14 @@ abstraction, and a deployment target.
 ### Monorepo layout
 
 ```
-apps/web     Next.js (App Router) frontend
-apps/api     FastAPI backend
+frontend/    Next.js (App Router) frontend
+backend/     FastAPI backend
 packages/    Shared code (TypeScript types, config) — populated as needed
 docs/        Architecture, API, database, deployment, development, product docs
 ```
 
 pnpm workspaces + Turborepo manage the JS side. The Python API is a separate
-`uv`-managed project under `apps/api` — it does not participate in Turborepo
+`uv`-managed project under `backend` — it does not participate in Turborepo
 task graphs, since Python and JS have independent toolchains.
 
 **Why:** A single repo keeps frontend/backend contracts easy to review
@@ -30,7 +30,7 @@ belong in.
 
 ### Backend: FastAPI + Pydantic v2 + SQLAlchemy (async) + Alembic
 
-Layered structure under `apps/api/app/`:
+Layered structure under `backend/app/`:
 
 - `api/v1/routes/` — HTTP handlers only. No business logic.
 - `services/` — business logic, orchestrates repositories and integrations.

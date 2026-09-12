@@ -3,8 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.domain.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
-from app.domain.pull_request_analysis import PullRequestAnalysis
+from app.models.pr_analysis_status import PRAnalysisStatus, PRRiskLevel
+from app.models.pull_request_analysis import PullRequestAnalysis
 
 
 class AffectedComponentPublic(BaseModel):

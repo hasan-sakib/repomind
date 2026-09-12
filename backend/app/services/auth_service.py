@@ -10,10 +10,10 @@ from app.core.security.tokens import (
     generate_opaque_token,
     hash_opaque_token,
 )
-from app.domain.session import Session
-from app.domain.user import User
 from app.integrations.email.factory import get_email_sender
 from app.integrations.github.oauth import GitHubUser
+from app.models.session import Session
+from app.models.user import User
 from app.repositories import (
     audit_log_repository,
     refresh_token_repository,

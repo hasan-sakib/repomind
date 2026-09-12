@@ -17,19 +17,19 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
-from app.domain.repository_status import RepositoryStatus
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.repository_status import RepositoryStatus
 
 if TYPE_CHECKING:
-    from app.domain.branch import Branch
-    from app.domain.code_file import CodeFile
-    from app.domain.commit import Commit
-    from app.domain.conversation import Conversation
-    from app.domain.github_installation import GitHubInstallation
-    from app.domain.indexing_job import IndexingJob
-    from app.domain.issue import Issue
-    from app.domain.pull_request import PullRequest
-    from app.domain.repository_membership import RepositoryMembership
+    from app.models.branch import Branch
+    from app.models.code_file import CodeFile
+    from app.models.commit import Commit
+    from app.models.conversation import Conversation
+    from app.models.github_installation import GitHubInstallation
+    from app.models.indexing_job import IndexingJob
+    from app.models.issue import Issue
+    from app.models.pull_request import PullRequest
+    from app.models.repository_membership import RepositoryMembership
 
 
 class Repository(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):

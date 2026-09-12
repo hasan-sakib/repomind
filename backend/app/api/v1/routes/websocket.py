@@ -20,8 +20,8 @@ from fastapi import APIRouter, Cookie, WebSocket, WebSocketDisconnect
 from app.core.config import get_settings
 from app.core.security.tokens import InvalidTokenError, decode_access_token
 from app.db.session import async_session_factory
-from app.domain.role import Role
 from app.events.bus import subscribe
+from app.models.role import Role
 from app.repositories import session_repository
 from app.services import organization_service
 from app.services.exceptions import AppError

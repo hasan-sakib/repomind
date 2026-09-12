@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.session import Session
+from app.models.session import Session
 
 
 async def get_by_id(db: AsyncSession, session_id: uuid.UUID) -> Session | None:

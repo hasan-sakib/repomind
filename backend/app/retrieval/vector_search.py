@@ -8,11 +8,11 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.chat_status import RetrievalSourceType
-from app.domain.code_chunk import CodeChunk
-from app.domain.code_embedding import CodeEmbedding
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
+from app.models.chat_status import RetrievalSourceType
+from app.models.code_chunk import CodeChunk
+from app.models.code_embedding import CodeEmbedding
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
 from app.retrieval.types import RetrievedChunk
 
 

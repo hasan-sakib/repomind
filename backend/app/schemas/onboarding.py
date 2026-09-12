@@ -3,8 +3,8 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.domain.onboarding_guide import OnboardingGuide
-from app.domain.onboarding_status import OnboardingGuideStatus
+from app.models.onboarding_guide import OnboardingGuide
+from app.models.onboarding_status import OnboardingGuideStatus
 
 
 class ImportantModulePublic(BaseModel):

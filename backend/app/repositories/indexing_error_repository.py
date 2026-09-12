@@ -2,8 +2,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.indexing_error import IndexingError
-from app.domain.indexing_status import IndexingStage
+from app.models.indexing_error import IndexingError
+from app.models.indexing_status import IndexingStage
 
 
 def create(

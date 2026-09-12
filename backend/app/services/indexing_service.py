@@ -2,9 +2,9 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.indexing_job import IndexingJob
-from app.domain.indexing_status import IndexingTrigger
-from app.domain.repository import Repository
+from app.models.indexing_job import IndexingJob
+from app.models.indexing_status import IndexingTrigger
+from app.models.repository import Repository
 from app.repositories import branch_repository, indexing_job_repository
 from app.services.exceptions import IndexingJobNotFoundError, RepositoryNotSyncedError
 

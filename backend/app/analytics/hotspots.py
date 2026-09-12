@@ -11,8 +11,8 @@ from collections import defaultdict
 
 from app.architecture.classifier import classify_path
 from app.architecture.graph_builder import package_of
-from app.domain.analytics_snapshot import ArchitectureHotspotRecord, FileHotspotRecord
 from app.integrations.github.schemas import GitHubPullRequestFile
+from app.models.analytics_snapshot import ArchitectureHotspotRecord, FileHotspotRecord
 
 
 def aggregate_hotspots(

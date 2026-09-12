@@ -3,9 +3,9 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
-from app.domain.indexing_error import IndexingError
-from app.domain.indexing_job import IndexingJob
-from app.domain.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
+from app.models.indexing_error import IndexingError
+from app.models.indexing_job import IndexingJob
+from app.models.indexing_status import IndexingJobStatus, IndexingStage, IndexingTrigger
 
 
 class IndexingErrorPublic(BaseModel):

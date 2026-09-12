@@ -1,7 +1,7 @@
 import uuid
 from dataclasses import dataclass
 
-from app.domain.chat_status import RetrievalSourceType
+from app.models.chat_status import RetrievalSourceType
 
 
 @dataclass(frozen=True, slots=True)

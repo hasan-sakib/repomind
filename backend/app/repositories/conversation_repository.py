@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.domain.conversation import Conversation
+from app.models.conversation import Conversation
 
 
 async def get(db: AsyncSession, conversation_id: uuid.UUID) -> Conversation | None:

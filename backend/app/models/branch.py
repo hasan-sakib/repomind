@@ -7,10 +7,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import UUIDPrimaryKeyMixin
+from app.models.mixins import UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.domain.repository import Repository
+    from app.models.repository import Repository
 
 
 class Branch(UUIDPrimaryKeyMixin, Base):

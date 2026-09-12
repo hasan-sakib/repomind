@@ -3,8 +3,8 @@ bounded window) — no extra GitHub calls."""
 
 from datetime import datetime
 
-from app.domain.analytics_snapshot import StaleIssueRecord
-from app.domain.issue import Issue
+from app.models.analytics_snapshot import StaleIssueRecord
+from app.models.issue import Issue
 
 
 def bucket_daily_issue_counts(issues: list[Issue]) -> dict[str, int]:

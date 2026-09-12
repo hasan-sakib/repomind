@@ -2,7 +2,7 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.code_embedding import CodeEmbedding
+from app.models.code_embedding import CodeEmbedding
 
 
 def create(

@@ -6,12 +6,12 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
-from app.domain.role import Role
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.role import Role
 
 if TYPE_CHECKING:
-    from app.domain.organization import Organization
-    from app.domain.user import User
+    from app.models.organization import Organization
+    from app.models.user import User
 
 
 class OrganizationMember(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):

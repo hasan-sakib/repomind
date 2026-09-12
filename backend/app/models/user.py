@@ -5,11 +5,11 @@ from sqlalchemy import DateTime, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.domain.organization_member import OrganizationMember
-    from app.domain.session import Session
+    from app.models.organization_member import OrganizationMember
+    from app.models.session import Session
 
 
 class User(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):

@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.db.session import async_session_factory
-from app.domain.repository import Repository
 from app.events.publish import publish_notification, publish_state
 from app.events.types import EventCategory
 from app.integrations.github import app_client, rest_client
+from app.models.repository import Repository
 from app.repositories import (
     branch_repository,
     commit_repository,

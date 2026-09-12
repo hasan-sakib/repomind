@@ -9,9 +9,9 @@ from app.api.deps import (
     require_csrf_header,
     require_organization_role,
 )
-from app.domain.organization_member import OrganizationMember
-from app.domain.role import Role
-from app.domain.user import User
+from app.models.organization_member import OrganizationMember
+from app.models.role import Role
+from app.models.user import User
 from app.repositories import organization_repository
 from app.schemas.organization import (
     AddMemberRequest,

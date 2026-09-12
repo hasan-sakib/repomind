@@ -14,8 +14,8 @@ from pathlib import Path
 
 from app.architecture.classifier import classify_path
 from app.architecture.types import FileRanking
-from app.domain.code_file import CodeFile
-from app.domain.code_symbol import CodeSymbol
+from app.models.code_file import CodeFile
+from app.models.code_symbol import CodeSymbol
 
 _ENTRY_POINT_CANDIDATES = (
     "main.py",

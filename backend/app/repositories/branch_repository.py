@@ -5,7 +5,7 @@ from sqlalchemy import delete as sa_delete
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.domain.branch import Branch
+from app.models.branch import Branch
 
 
 async def list_for_repository(db: AsyncSession, repository_id: uuid.UUID) -> list[Branch]:

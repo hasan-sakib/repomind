@@ -1,8 +1,8 @@
 # Design System
 
 This documents the actual token and component decisions implemented in
-`apps/web` for Phase 1 (application shell). It supersedes any tokens
-shadcn's `init` scaffolded by default — see `apps/web/src/app/globals.css`
+`frontend` for Phase 1 (application shell). It supersedes any tokens
+shadcn's `init` scaffolded by default — see `frontend/app/globals.css`
 for the source of truth; this file explains the _why_ behind it.
 
 ## Foundation

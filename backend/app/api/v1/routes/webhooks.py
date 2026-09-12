@@ -4,8 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, Header, Request
 
 from app.api.deps import ArqPool, DbSession
-from app.domain.indexing_status import IndexingTrigger
 from app.integrations.github.webhooks import SUPPORTED_EVENTS, verify_signature
+from app.models.indexing_status import IndexingTrigger
 from app.repositories import repository_repository
 from app.services import indexing_service, webhook_service
 from app.services.exceptions import WebhookVerificationError

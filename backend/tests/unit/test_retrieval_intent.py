@@ -1,4 +1,4 @@
-from app.domain.chat_status import QueryIntent
+from app.models.chat_status import QueryIntent
 from app.retrieval.intent import detect_intent, extract_symbol_name
 
 

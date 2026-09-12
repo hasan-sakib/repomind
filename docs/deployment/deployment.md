@@ -26,7 +26,7 @@ graph TB
     Browser["Browser"]
 
     subgraph Vercel
-        Web["Next.js web app<br/>(apps/web, root dir set in Vercel)"]
+        Web["Next.js web app<br/>(frontend, root dir set in Vercel)"]
     end
 
     subgraph "Fly.io app: repomind-api"
@@ -67,17 +67,17 @@ implementation begins.
 
 ## 2. Web: Vercel
 
-`apps/web` deploys to Vercel with the project's **root directory** set to
-`apps/web` (Vercel's monorepo support: it runs `pnpm install`/`pnpm build`
+`frontend` deploys to Vercel with the project's **root directory** set to
+`frontend` (Vercel's monorepo support: it runs `pnpm install`/`pnpm build`
 scoped to that directory while still resolving the pnpm workspace at the
-repo root, since `apps/web`'s `package.json` participates in the top-level
+repo root, since `frontend`'s `package.json` participates in the top-level
 `pnpm-workspace.yaml`/Turborepo graph recorded in `0001-foundation.md`).
 
 Vercel's GitHub integration creates a **preview deployment per pull
 request** automatically — no custom workflow needed for this, it's Vercel's
 default PR behavior. Production deploys from `main`. `NEXT_PUBLIC_API_URL`
 is the one environment variable the web app needs (already scaffolded in
-`apps/web/.env.example`); it differs per Vercel environment (preview vs.
+`frontend/.env.example`); it differs per Vercel environment (preview vs.
 production — see §5).
 
 ## 3. Domains and the cookie/CORS constraint
@@ -129,7 +129,7 @@ judgment call made at the architecture stage, not a benchmarked platform
 comparison — revisit if Fly's actual operational cost or reliability at
 RepoMind's scale doesn't bear this out.
 
-**One Fly app, two process groups.** `apps/api/fly.toml` defines both
+**One Fly app, two process groups.** `backend/fly.toml` defines both
 processes from the same image:
 
 ```toml
@@ -270,7 +270,7 @@ behavior, any size limit) is not independently verified here.
 ## 9. CI/CD
 
 `.github/workflows/ci.yml` stays exactly as it is — it already runs
-lint/typecheck/build for `apps/web` and lint/typecheck/test for `apps/api`
+lint/typecheck/build for `frontend` and lint/typecheck/test for `backend`
 against a Postgres service container, on every push to `main` and every PR.
 Nothing in this document changes it.
 

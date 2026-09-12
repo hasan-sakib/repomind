@@ -19,18 +19,18 @@ from sqlalchemy.orm import selectinload
 from app.ai.provider import AIProvider, ChatMessage
 from app.core.config import Settings, get_settings
 from app.db.session import async_session_factory
-from app.domain.pull_request import PullRequest
-from app.domain.pull_request_analysis import (
+from app.events.publish import publish_notification, publish_state
+from app.events.types import EventCategory
+from app.integrations.github import app_client, rest_client
+from app.models.pull_request import PullRequest
+from app.models.pull_request_analysis import (
     AffectedComponentRecord,
     ChangedFileRecord,
     PotentialConcernRecord,
     PullRequestAnalysis,
     RecommendedTestRecord,
 )
-from app.domain.repository import Repository
-from app.events.publish import publish_notification, publish_state
-from app.events.types import EventCategory
-from app.integrations.github import app_client, rest_client
+from app.models.repository import Repository
 from app.pr_analysis import prompt as pr_prompt
 from app.pr_analysis.context import PRAnalysisContext, build_context
 from app.pr_analysis.result_schema import (

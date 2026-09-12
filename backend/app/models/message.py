@@ -6,11 +6,11 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.chat_status import MessageFeedback, MessageRole
-from app.domain.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
+from app.models.chat_status import MessageFeedback, MessageRole
+from app.models.mixins import CreatedAtMixin, UUIDPrimaryKeyMixin, enum_column
 
 if TYPE_CHECKING:
-    from app.domain.conversation import Conversation
+    from app.models.conversation import Conversation
 
 
 class Message(UUIDPrimaryKeyMixin, CreatedAtMixin, Base):

@@ -46,7 +46,7 @@ coverage/
 htmlcov/
 
 # Alembic
-apps/api/**/*.pyc
+backend/**/*.pyc
 
 # Misc
 *.tsbuildinfo

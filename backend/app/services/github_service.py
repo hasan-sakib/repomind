@@ -4,9 +4,9 @@ from urllib.parse import urlencode
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
-from app.domain.github_installation import GitHubInstallation
 from app.integrations.github import app_client, rest_client
 from app.integrations.github.schemas import GitHubRepo
+from app.models.github_installation import GitHubInstallation
 from app.repositories import github_installation_repository, repository_repository
 
 settings = get_settings()

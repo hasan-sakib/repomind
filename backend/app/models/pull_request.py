@@ -7,10 +7,10 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.domain.mixins import UUIDPrimaryKeyMixin
+from app.models.mixins import UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
-    from app.domain.repository import Repository
+    from app.models.repository import Repository
 
 
 class PullRequest(UUIDPrimaryKeyMixin, Base):
@@ -28,7 +28,7 @@ class PullRequest(UUIDPrimaryKeyMixin, Base):
     author_login: Mapped[str | None] = mapped_column(String(200), nullable=True)
     html_url: Mapped[str] = mapped_column(String(500), nullable=False)
     # The PR's current head commit — the cache key for PullRequestAnalysis
-    # (app/domain/pull_request_analysis.py): a new commit pushed to the PR
+    # (app/models/pull_request_analysis.py): a new commit pushed to the PR
     # moves this, invalidating any cached analysis at the old sha.
     head_sha: Mapped[str] = mapped_column(String(40), nullable=False, server_default="")
     github_created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
