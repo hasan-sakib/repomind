@@ -79,6 +79,25 @@ async def test_login_nonexistent_email_gives_same_generic_error(client: AsyncCli
     assert response.json()["error"]["code"] == "invalid_credentials"
 
 
+async def test_login_is_rate_limited_per_ip(client: AsyncClient) -> None:
+    from app.core.config import get_settings
+
+    limit = get_settings().rate_limit_login_per_minute
+    for _ in range(limit):
+        response = await client.post(
+            "/api/v1/auth/login",
+            json={"email": "nobody@example.com", "password": "whatever"},
+        )
+        assert response.status_code == 401
+
+    over_limit_response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": "nobody@example.com", "password": "whatever"},
+    )
+    assert over_limit_response.status_code == 429
+    assert over_limit_response.json()["error"]["code"] == "rate_limit_exceeded"
+
+
 async def test_me_requires_authentication(client: AsyncClient) -> None:
     response = await client.get("/api/v1/auth/me")
     assert response.status_code == 401
@@ -88,6 +107,13 @@ async def test_me_requires_authentication(client: AsyncClient) -> None:
 async def test_logout_without_csrf_header_is_rejected(client: AsyncClient) -> None:
     await _register(client, "csrf@example.com")
     response = await client.post("/api/v1/auth/logout", headers={"X-Requested-With": ""})
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "csrf_failed"
+
+
+async def test_refresh_without_csrf_header_is_rejected(client: AsyncClient) -> None:
+    await _register(client, "csrf-refresh@example.com")
+    response = await client.post("/api/v1/auth/refresh", headers={"X-Requested-With": ""})
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "csrf_failed"
 

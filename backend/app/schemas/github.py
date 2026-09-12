@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.integrations.github.schemas import GitHubRepo
 from app.models.branch import Branch
@@ -42,7 +42,9 @@ class AvailableRepositoryPublic(BaseModel):
 class ConnectRepositoryRequest(BaseModel):
     installation_id: uuid.UUID
     github_repo_id: int
-    full_name: str
+    # Matches Repository.full_name's column width (app/models/repository.py)
+    # — reject oversized input at the API boundary rather than at the DB.
+    full_name: str = Field(min_length=1, max_length=300)
 
 
 class RepositoryPublic(BaseModel):

@@ -1,8 +1,10 @@
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+MIN_JWT_SECRET_LENGTH = 32
 
 
 class Settings(BaseSettings):
@@ -81,6 +83,16 @@ class Settings(BaseSettings):
     # Phase 3's FastAPI BackgroundTasks.
     redis_url: str = "redis://localhost:6379"
 
+    # Per-IP rate limits (app/core/rate_limit.py) on the unauthenticated
+    # endpoints most attractive to brute-force/abuse — credential stuffing,
+    # account enumeration via registration, password-reset email bombing.
+    # See docs/architecture/security.md.
+    rate_limit_login_per_minute: int = 10
+    rate_limit_register_per_minute: int = 5
+    rate_limit_refresh_per_minute: int = 30
+    rate_limit_password_reset_per_minute: int = 5
+    rate_limit_email_verify_per_minute: int = 5
+
     # Indexing pipeline tunables.
     indexing_max_file_size_bytes: int = 500_000
     indexing_max_files_per_repository: int = 3000
@@ -112,6 +124,21 @@ class Settings(BaseSettings):
     # option today) means no real subscription billing is wired up; plan
     # changes happen directly via organization_service.set_plan.
     billing_provider: Literal["null"] = "null"
+
+    @model_validator(mode="after")
+    def _require_strong_jwt_secret(self) -> "Settings":
+        """A short/empty JWT_SECRET lets anyone forge a session for any
+        user (HS256 with a known or empty key is trivially reproducible) —
+        this must fail loudly at startup in every environment, not just
+        production, rather than silently signing tokens with a weak key.
+        See docs/architecture/security.md."""
+        if len(self.jwt_secret) < MIN_JWT_SECRET_LENGTH:
+            raise ValueError(
+                f"JWT_SECRET must be at least {MIN_JWT_SECRET_LENGTH} characters "
+                "(generate one with `openssl rand -hex 32`) — refusing to start "
+                "with a short or empty secret."
+            )
+        return self
 
 
 @lru_cache

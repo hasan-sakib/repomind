@@ -12,6 +12,7 @@ from app.api.deps import (
 )
 from app.api.v1.cookie_utils import clear_session_cookies, set_session_cookies
 from app.core.config import get_settings
+from app.core.rate_limit import rate_limit
 from app.integrations.github import oauth as github_oauth
 from app.models.session import Session
 from app.models.user import User
@@ -43,7 +44,16 @@ def _github_redirect_uri(request: Request) -> str:
     return f"{str(request.base_url).rstrip('/')}{settings.api_v1_prefix}/auth/github/callback"
 
 
-@router.post("/register", response_model=AuthResponse, status_code=201)
+@router.post(
+    "/register",
+    response_model=AuthResponse,
+    status_code=201,
+    dependencies=[
+        Depends(
+            rate_limit(name="register", max_requests=settings.rate_limit_register_per_minute)
+        )
+    ],
+)
 async def register(
     body: RegisterRequest, request: Request, response: Response, db: DbSession
 ) -> AuthResponse:
@@ -61,7 +71,13 @@ async def register(
     return AuthResponse(user=UserPublic.from_user(result.user))
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post(
+    "/login",
+    response_model=AuthResponse,
+    dependencies=[
+        Depends(rate_limit(name="login", max_requests=settings.rate_limit_login_per_minute))
+    ],
+)
 async def login(
     body: LoginRequest, request: Request, response: Response, db: DbSession
 ) -> AuthResponse:
@@ -89,7 +105,14 @@ async def logout(
     clear_session_cookies(response)
 
 
-@router.post("/refresh", status_code=204)
+@router.post(
+    "/refresh",
+    status_code=204,
+    dependencies=[
+        Depends(require_csrf_header),
+        Depends(rate_limit(name="refresh", max_requests=settings.rate_limit_refresh_per_minute)),
+    ],
+)
 async def refresh(
     response: Response,
     db: DbSession,
@@ -113,17 +136,51 @@ async def me(db: DbSession, user: Annotated[User, Depends(get_current_user)]) ->
     )
 
 
-@router.post("/password-reset/request", status_code=204)
+@router.post(
+    "/password-reset/request",
+    status_code=204,
+    dependencies=[
+        Depends(
+            rate_limit(
+                name="password-reset-request",
+                max_requests=settings.rate_limit_password_reset_per_minute,
+            )
+        )
+    ],
+)
 async def request_password_reset(body: PasswordResetRequestRequest, db: DbSession) -> None:
     await auth_service.request_password_reset(db, email=body.email)
 
 
-@router.post("/password-reset/confirm", status_code=204)
+@router.post(
+    "/password-reset/confirm",
+    status_code=204,
+    dependencies=[
+        Depends(
+            rate_limit(
+                name="password-reset-confirm",
+                max_requests=settings.rate_limit_password_reset_per_minute,
+            )
+        )
+    ],
+)
 async def confirm_password_reset(body: PasswordResetConfirmRequest, db: DbSession) -> None:
     await auth_service.confirm_password_reset(db, token=body.token, new_password=body.new_password)
 
 
-@router.post("/email/verify/request", status_code=204, dependencies=[Depends(require_csrf_header)])
+@router.post(
+    "/email/verify/request",
+    status_code=204,
+    dependencies=[
+        Depends(require_csrf_header),
+        Depends(
+            rate_limit(
+                name="email-verify-request",
+                max_requests=settings.rate_limit_email_verify_per_minute,
+            )
+        ),
+    ],
+)
 async def request_email_verification(
     db: DbSession, user: Annotated[User, Depends(get_current_user)]
 ) -> None:

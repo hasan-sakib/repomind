@@ -91,3 +91,34 @@ def test_language_is_detected_from_extension(tmp_path: Path) -> None:
     assert files["app.ts"] == "typescript"
     assert files["app.go"] == "go"
     assert files["notes.txt"] is None
+
+
+def test_symlink_escaping_the_repo_root_is_not_followed(tmp_path: Path) -> None:
+    """A malicious repository could contain a symlink pointing outside the
+    clone directory (e.g. at a host secret) — discover_files must never
+    read through it. See docs/architecture/security.md."""
+    outside = tmp_path.parent / "outside-secret.txt"
+    outside.write_text("super secret host file contents\n")
+
+    repo_root = tmp_path / "repo"
+    _write(repo_root, "src/main.py", "print('hi')\n")
+    (repo_root / "leaked").symlink_to(outside)
+
+    files = discover_files(repo_root, max_file_size_bytes=1_000_000, max_files=100)
+
+    assert {f.path for f in files} == {"src/main.py"}
+
+
+def test_symlinked_directory_is_not_traversed(tmp_path: Path) -> None:
+    outside_dir = tmp_path.parent / "outside-dir"
+    outside_dir.mkdir()
+    (outside_dir / "secret.py").write_text("secret = 1\n")
+
+    repo_root = tmp_path / "repo"
+    _write(repo_root, "src/main.py", "print('hi')\n")
+    repo_root.mkdir(exist_ok=True)
+    (repo_root / "linked_dir").symlink_to(outside_dir, target_is_directory=True)
+
+    files = discover_files(repo_root, max_file_size_bytes=1_000_000, max_files=100)
+
+    assert {f.path for f in files} == {"src/main.py"}

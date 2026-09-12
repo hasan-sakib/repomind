@@ -48,6 +48,7 @@ from sqlalchemy.pool import NullPool
 from app import models  # noqa: F401  (populates Base.metadata)
 from app.api.deps import get_arq_pool
 from app.core.config import get_settings
+from app.core.rate_limit import reset_all_rate_limits
 from app.db.base import Base
 from app.db.session import get_db_session
 from app.main import app
@@ -107,6 +108,17 @@ class FakeArqPool:
 @pytest.fixture
 def fake_arq_pool() -> FakeArqPool:
     return FakeArqPool()
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def _reset_rate_limits() -> AsyncGenerator[None]:
+    """Rate-limit counters live in Redis, not Postgres, so they aren't
+    covered by db_session's per-test TRUNCATE — without this, an earlier
+    test's requests to a rate-limited route (e.g. /auth/login) would count
+    against a later, unrelated test's limit."""
+    await reset_all_rate_limits()
+    yield
+    await reset_all_rate_limits()
 
 
 @pytest_asyncio.fixture

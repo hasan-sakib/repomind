@@ -35,7 +35,12 @@ async def _sse(events: AsyncIterator[ChatStreamEvent]) -> AsyncIterator[str]:
         yield f"event: {event.type}\ndata: {event.model_dump_json()}\n\n"
 
 
-@router.post("", response_model=ConversationPublic, status_code=201)
+@router.post(
+    "",
+    response_model=ConversationPublic,
+    status_code=201,
+    dependencies=[Depends(require_csrf_header)],
+)
 async def create_conversation(
     repository: Annotated[Repository, Depends(require_repository_access)],
     user: Annotated[User, Depends(get_current_user)],

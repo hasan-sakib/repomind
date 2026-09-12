@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 
+import pytest
+
 from app.core.config import get_settings
 from app.integrations.github.webhooks import verify_signature
 
@@ -37,3 +39,17 @@ def test_missing_signature_header_is_rejected() -> None:
 
 def test_malformed_signature_header_is_rejected() -> None:
     assert verify_signature(b"{}", "not-sha256-prefixed") is False
+
+
+def test_empty_configured_secret_rejects_everything(monkeypatch: pytest.MonkeyPatch) -> None:
+    """An unset GITHUB_WEBHOOK_SECRET must fail closed — HMAC-ing with a
+    known (empty) key is something anyone can reproduce, so this must not
+    silently behave as "no verification" while looking verified."""
+    import app.integrations.github.webhooks as webhooks_module
+
+    monkeypatch.setattr(webhooks_module.settings, "github_webhook_secret", "")
+    payload = b'{"action": "opened"}'
+    # Even a signature computed with the empty key (which anyone can do
+    # without knowing any secret) must not be accepted.
+    forged = _sign(payload, "")
+    assert verify_signature(payload, forged) is False

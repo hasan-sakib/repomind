@@ -166,3 +166,8 @@ class ApiKeyNotFoundError(AppError):
 class BillingNotConfiguredError(AppError):
     status_code = 501
     code = "billing_not_configured"
+
+
+class RateLimitExceededError(AppError):
+    status_code = 429
+    code = "rate_limit_exceeded"

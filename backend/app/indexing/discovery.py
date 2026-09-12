@@ -73,6 +73,15 @@ def discover_files(
     discovered: list[DiscoveredFile] = []
 
     for candidate in sorted(repo_root.rglob("*")):
+        # Never follow symlinks: `is_file()`/`read_bytes()` transparently
+        # resolve them, so a repository containing a symlink to a path
+        # outside the clone directory (e.g. `evil -> /etc/passwd`) would
+        # otherwise have the target's content read and indexed as if it
+        # were the repo's own source — a path-traversal / arbitrary local
+        # file read via a repository the attacker fully controls. See
+        # docs/architecture/security.md.
+        if candidate.is_symlink():
+            continue
         if not candidate.is_file():
             continue
         relative = candidate.relative_to(repo_root)

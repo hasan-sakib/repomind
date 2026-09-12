@@ -120,6 +120,18 @@ async def test_ask_streams_sse_events_over_http(client: AsyncClient, httpx_mock:
     assert detail["conversation"]["title"] is not None
 
 
+async def test_create_conversation_requires_csrf_header(
+    client: AsyncClient, httpx_mock: HTTPXMock
+) -> None:
+    repository_id = await _connect_a_repository(client, httpx_mock)
+    response = await client.post(
+        f"/api/v1/repositories/{repository_id}/conversations",
+        headers={"X-Requested-With": ""},
+    )
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "csrf_failed"
+
+
 async def test_ask_requires_csrf_header(client: AsyncClient, httpx_mock: HTTPXMock) -> None:
     repository_id = await _connect_a_repository(client, httpx_mock)
     create_response = await client.post(f"/api/v1/repositories/{repository_id}/conversations")
