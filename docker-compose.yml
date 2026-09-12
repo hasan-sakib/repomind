@@ -80,8 +80,19 @@ services:
       dockerfile: frontend/Dockerfile
       args:
         # Baked into the client bundle at build time (Next.js NEXT_PUBLIC_*
-        # rule) — override with --build-arg if the API isn't on localhost.
+        # rule) — this is what the *browser* calls, so it must stay
+        # host-reachable (localhost:8000, from the browser's point of
+        # view), never the compose-network service name.
         NEXT_PUBLIC_API_URL: http://localhost:8000
+    environment:
+      # Set at *runtime* (not a build arg — this one isn't NEXT_PUBLIC_,
+      # so it's never in the client bundle and can change without a
+      # rebuild). Used only by Server Components/route handlers running
+      # inside this container (lib/server-api.ts) — from there, "api" is
+      # this compose network's service name, not "localhost", which would
+      # otherwise resolve to the web container itself and fail with
+      # ECONNREFUSED (the exact bug this fixed).
+      API_INTERNAL_URL: http://api:8000
     restart: unless-stopped
     ports:
       - "3000:3000"
