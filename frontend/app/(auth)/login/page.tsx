@@ -7,6 +7,7 @@ import { useState } from "react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { FieldError } from "@/components/auth/field-error";
 import { GitHubContinueLink } from "@/components/auth/github-continue-link";
+import { SplitAuthLayout } from "@/components/auth/split-auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,59 +49,61 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthCard
-      title="Sign in to RepoMind"
-      description="Connect a repository to ask grounded questions about your codebase."
-      footer={
-        <>
-          Don&apos;t have an account?{" "}
-          <Link href="/register" className="font-medium text-foreground hover:text-brand">
-            Create one
-          </Link>
-        </>
-      }
-    >
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-invalid={!!fieldErrors.email}
-          />
-          <FieldError message={fieldErrors.email} />
-        </div>
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link
-              href="/forgot-password"
-              className="text-xs text-muted-foreground hover:text-brand"
-            >
-              Forgot password?
+    <SplitAuthLayout>
+      <AuthCard
+        title="Sign in to RepoMind"
+        description="Connect a repository to ask grounded questions about your codebase."
+        footer={
+          <>
+            Don&apos;t have an account?{" "}
+            <Link href="/register" className="font-medium text-foreground hover:text-brand">
+              Create one
             </Link>
+          </>
+        }
+      >
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={!!fieldErrors.email}
+            />
+            <FieldError message={fieldErrors.email} />
           </div>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            aria-invalid={!!fieldErrors.password}
-          />
-          <FieldError message={fieldErrors.password} />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                href="/forgot-password"
+                className="text-xs text-muted-foreground hover:text-brand"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-invalid={!!fieldErrors.password}
+            />
+            <FieldError message={fieldErrors.password} />
+          </div>
+          <FieldError message={formError ?? undefined} />
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Signing in…" : "Sign in"}
+          </Button>
+        </form>
+        <div className="mt-4">
+          <GitHubContinueLink />
         </div>
-        <FieldError message={formError ?? undefined} />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
-      <div className="mt-4">
-        <GitHubContinueLink />
-      </div>
-    </AuthCard>
+      </AuthCard>
+    </SplitAuthLayout>
   );
 }

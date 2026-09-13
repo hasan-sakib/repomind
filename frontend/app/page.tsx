@@ -1,22 +1,29 @@
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
+import { CinematicFooter } from "@/components/ui/motion-footer";
 import { FeatureGrid } from "@/components/landing/feature-grid";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 py-5 sm:px-6">
         <span className="text-sm font-semibold tracking-tight">RepoMind</span>
-        <div className="flex items-center gap-2">
-          <Button render={<Link href="/login" />} variant="ghost" size="sm">
-            Sign in
-          </Button>
-          <Button render={<Link href="/register" />} size="sm">
-            Create account
-          </Button>
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <Button render={<Link href="/login" />} variant="ghost" size="sm">
+              Sign in
+            </Button>
+            <Button render={<Link href="/register" />} size="sm">
+              Create account
+            </Button>
+          </div>
         </div>
       </header>
+
+      <CinematicFooter />
 
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col px-4 sm:px-6">
         <section className="flex flex-col items-start gap-5 py-16 sm:py-24">
@@ -38,10 +45,6 @@ export default function Home() {
 
         <FeatureGrid />
       </main>
-
-      <footer className="mx-auto w-full max-w-5xl px-4 py-6 text-xs text-muted-foreground sm:px-6">
-        RepoMind
-      </footer>
     </div>
   );
 }

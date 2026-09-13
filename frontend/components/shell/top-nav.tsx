@@ -8,6 +8,7 @@ import { ConnectionStatus } from "@/components/shell/connection-status";
 import { NotificationsMenu } from "@/components/shell/notifications-menu";
 import { useShell } from "@/components/shell/shell-context";
 import { UserMenu } from "@/components/shell/user-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function TopNav() {
   const { setMobileNavOpen, setCommandPaletteOpen } = useShell();
@@ -47,6 +48,7 @@ export function TopNav() {
         <SearchIcon className="size-4" />
       </Button>
       <ConnectionStatus />
+      <ThemeToggle />
       <NotificationsMenu />
       <UserMenu />
     </header>

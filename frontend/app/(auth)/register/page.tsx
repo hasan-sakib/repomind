@@ -7,6 +7,7 @@ import { useState } from "react";
 import { AuthCard } from "@/components/auth/auth-card";
 import { FieldError } from "@/components/auth/field-error";
 import { GitHubContinueLink } from "@/components/auth/github-continue-link";
+import { SplitAuthLayout } from "@/components/auth/split-auth-layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,62 +55,64 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthCard
-      title="Create your account"
-      description="Connect a repository and start asking questions about your codebase."
-      footer={
-        <>
-          Already have an account?{" "}
-          <Link href="/login" className="font-medium text-foreground hover:text-brand">
-            Sign in
-          </Link>
-        </>
-      }
-    >
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div className="space-y-1.5">
-          <Label htmlFor="full_name">Full name</Label>
-          <Input
-            id="full_name"
-            autoComplete="name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            aria-invalid={!!fieldErrors.full_name}
-          />
-          <FieldError message={fieldErrors.full_name} />
+    <SplitAuthLayout>
+      <AuthCard
+        title="Create your account"
+        description="Connect a repository and start asking questions about your codebase."
+        footer={
+          <>
+            Already have an account?{" "}
+            <Link href="/login" className="font-medium text-foreground hover:text-brand">
+              Sign in
+            </Link>
+          </>
+        }
+      >
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+          <div className="space-y-1.5">
+            <Label htmlFor="full_name">Full name</Label>
+            <Input
+              id="full_name"
+              autoComplete="name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              aria-invalid={!!fieldErrors.full_name}
+            />
+            <FieldError message={fieldErrors.full_name} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-invalid={!!fieldErrors.email}
+            />
+            <FieldError message={fieldErrors.email} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              aria-invalid={!!fieldErrors.password}
+            />
+            <FieldError message={fieldErrors.password} />
+          </div>
+          <FieldError message={formError ?? undefined} />
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Creating account…" : "Create account"}
+          </Button>
+        </form>
+        <div className="mt-4">
+          <GitHubContinueLink />
         </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            aria-invalid={!!fieldErrors.email}
-          />
-          <FieldError message={fieldErrors.email} />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            aria-invalid={!!fieldErrors.password}
-          />
-          <FieldError message={fieldErrors.password} />
-        </div>
-        <FieldError message={formError ?? undefined} />
-        <Button type="submit" className="w-full" disabled={submitting}>
-          {submitting ? "Creating account…" : "Create account"}
-        </Button>
-      </form>
-      <div className="mt-4">
-        <GitHubContinueLink />
-      </div>
-    </AuthCard>
+      </AuthCard>
+    </SplitAuthLayout>
   );
 }
