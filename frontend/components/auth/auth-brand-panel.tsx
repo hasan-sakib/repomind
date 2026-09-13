@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import type { COBEOptions } from "cobe";
 import {
   BarChart3Icon,
   BookOpenIcon,
@@ -9,6 +10,9 @@ import {
   MessageSquareIcon,
   SearchIcon,
 } from "lucide-react";
+
+import { Globe } from "@/components/ui/globe";
+import { useTheme } from "@/components/theme-provider";
 
 const FEATURES = [
   {
@@ -47,6 +51,46 @@ const EXAMPLE_PROMPTS = [
 const TYPE_MS = 35;
 const DELETE_MS = 18;
 const HOLD_MS = 1400;
+
+const GLOBE_MARKERS = [
+  { location: [14.5995, 120.9842] as [number, number], size: 0.03 },
+  { location: [19.076, 72.8777] as [number, number], size: 0.1 },
+  { location: [23.8103, 90.4125] as [number, number], size: 0.05 },
+  { location: [30.0444, 31.2357] as [number, number], size: 0.07 },
+  { location: [39.9042, 116.4074] as [number, number], size: 0.08 },
+  { location: [-23.5505, -46.6333] as [number, number], size: 0.1 },
+  { location: [19.4326, -99.1332] as [number, number], size: 0.1 },
+  { location: [40.7128, -74.006] as [number, number], size: 0.1 },
+  { location: [34.6937, 135.5022] as [number, number], size: 0.05 },
+  { location: [41.0082, 28.9784] as [number, number], size: 0.06 },
+];
+
+// Two palettes instead of one static config — cobe's colors are literal
+// RGB tuples, not CSS custom properties, so they can't just inherit the
+// panel's `.dark` tokens automatically the way everything else here does.
+const GLOBE_CONFIG_LIGHT: COBEOptions = {
+  width: 800,
+  height: 800,
+  onRender: () => {},
+  devicePixelRatio: 2,
+  phi: 0,
+  theta: 0.3,
+  dark: 0,
+  diffuse: 0.4,
+  mapSamples: 16000,
+  mapBrightness: 1.2,
+  baseColor: [1, 1, 1],
+  markerColor: [251 / 255, 100 / 255, 21 / 255],
+  glowColor: [1, 1, 1],
+  markers: GLOBE_MARKERS,
+};
+
+const GLOBE_CONFIG_DARK: COBEOptions = {
+  ...GLOBE_CONFIG_LIGHT,
+  dark: 1,
+  baseColor: [0.15, 0.16, 0.19],
+  glowColor: [0.25, 0.35, 0.55],
+};
 
 function TypewriterPrompt() {
   const [promptIndex, setPromptIndex] = useState(0);
@@ -87,6 +131,11 @@ function TypewriterPrompt() {
 
 export function AuthBrandPanel() {
   const [activeFeature, setActiveFeature] = useState(0);
+  const { theme } = useTheme();
+  const globeConfig = useMemo(
+    () => (theme === "dark" ? GLOBE_CONFIG_DARK : GLOBE_CONFIG_LIGHT),
+    [theme],
+  );
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -97,22 +146,13 @@ export function AuthBrandPanel() {
 
   return (
     <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border bg-sidebar px-10 py-12 lg:flex">
-      <motion.div
-        className="pointer-events-none absolute -left-24 -top-24 size-96 rounded-full bg-brand/10 blur-3xl"
-        animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-        aria-hidden="true"
-      />
-      <motion.div
-        className="pointer-events-none absolute -bottom-32 -right-16 size-80 rounded-full bg-brand/10 blur-3xl"
-        animate={{ x: [0, -30, 0], y: [0, -20, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-x-0 -bottom-32 z-0 mx-auto aspect-square w-full max-w-130 opacity-80">
+        <Globe key={theme} config={globeConfig} />
+      </div>
 
-      <span className="text-sm font-semibold tracking-tight">RepoMind</span>
+      <span className="relative z-10 text-sm font-semibold tracking-tight">RepoMind</span>
 
-      <div className="flex flex-col gap-8">
+      <div className="relative z-10 flex flex-col gap-8">
         <div className="space-y-2">
           <h2 className="max-w-sm text-2xl font-semibold tracking-tight text-balance">
             Codebase intelligence for the repositories you already have.
@@ -157,7 +197,7 @@ export function AuthBrandPanel() {
         </div>
       </div>
 
-      <span className="text-xs text-muted-foreground">
+      <span className="relative z-10 text-xs text-muted-foreground">
         © {new Date().getFullYear()} RepoMind
       </span>
     </div>
