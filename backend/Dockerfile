@@ -22,6 +22,14 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 FROM python:3.12-slim-bookworm AS runtime
 
 WORKDIR /app
+
+# The indexing pipeline shells out to the real `git` binary to clone
+# repositories (app/integrations/git/fetcher.py) — python:3.12-slim-bookworm
+# doesn't include it, so every indexing job failed with
+# "[Errno 2] No such file or directory: 'git'" until this was added.
+RUN apt-get update && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system app && useradd --system --gid app --no-create-home app
 
 COPY --from=builder --chown=app:app /app /app
