@@ -14,11 +14,11 @@ import {
 import { cn } from "cn";
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
-  { label: "Architecture", href: "/architecture", icon: NetworkIcon },
-  { label: "Onboarding", href: "/onboarding", icon: BookOpenIcon },
-  { label: "Analytics", href: "/analytics", icon: BarChart3Icon },
-  { label: "Settings", href: "/settings", icon: SettingsIcon },
+  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon, barColor: "bg-chart-1" },
+  { label: "Architecture", href: "/architecture", icon: NetworkIcon, barColor: "bg-chart-2" },
+  { label: "Onboarding", href: "/onboarding", icon: BookOpenIcon, barColor: "bg-chart-3" },
+  { label: "Analytics", href: "/analytics", icon: BarChart3Icon, barColor: "bg-chart-4" },
+  { label: "Settings", href: "/settings", icon: SettingsIcon, barColor: "bg-chart-5" },
 ];
 
 export function NavList({
@@ -58,6 +58,14 @@ export function NavList({
                 transition={{ duration: 0.18, ease: "easeOut" }}
               />
             )}
+            <span
+              className={cn(
+                "relative h-4 w-1 shrink-0 rounded-full transition-opacity",
+                item.barColor,
+                isActive ? "opacity-100" : "opacity-30",
+              )}
+              aria-hidden="true"
+            />
             <Icon className="relative size-4 shrink-0" aria-hidden="true" />
             <span className="relative">{item.label}</span>
           </Link>
